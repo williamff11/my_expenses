@@ -1,0 +1,53 @@
+version: "3"
+services:
+  # Services > Databases
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - ./services/postgres/.data:/var/lib/postgresql
+    ports:
+      - 5432:5432
+    networks:
+      - app-network
+
+  # Services > Storage
+  minio:
+    image: minio/minio
+    environment:
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+    volumes:
+      - ./services/minio/.data:/data
+    networks:
+      - app-network
+    command: minio server /data
+
+  # Services > Email
+  maildev:
+    networks:
+      - app-network
+    image: maildev/maildev
+
+  # Application > My Expenses
+  my_expenses:
+    image: jorgefrueda/elixir:1.11-ubuntu-20.04
+    volumes:
+      - .:/elixir
+    working_dir: /elixir
+    networks:
+      - app-network
+    ports:
+      - "4000:4000"
+    depends_on:
+      - postgres
+      - minio
+      - maildev
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres:
