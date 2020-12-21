@@ -3,8 +3,8 @@ defmodule MyExpenses.Support.Users do
 
   alias MyExpenses.Users.Schema.User
 
-  @spec insert_user() :: User.t()
-  def insert_user(params \\ %{}) do
+  @spec create_user() :: User.t()
+  def create_user(params \\ %{}) do
     default_params = %{
       name: Faker.StarWars.character(),
       email: Faker.Internet.email(),
