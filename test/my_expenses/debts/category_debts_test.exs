@@ -90,6 +90,57 @@ defmodule MyExpenses.Debts.CategoryDebts do
     end
   end
 
+  describe "update_category_debt" do
+    setup :setup_categoty_debts
+
+    test "edita a categoria conforme os dados passados", context do
+      %{category: category} = context
+
+      category_id = category.id
+
+      params_update = %{color: "#6bc5d2", description: "description"}
+
+      assert {:ok,
+              %Schema.CategoryDebts{
+                id: category_id,
+                name: _,
+                description: "description",
+                icon: _,
+                color: "#6bc5d2"
+              }} = Debts.update_category_debt(category, params_update)
+    end
+
+    test "erro ao tentar editar categoria com os parâmetros inválidos", context do
+      %{category: category} = context
+
+      category_id = category.id
+
+      params_update = %{color: "#6bc5d2", name: "ar"}
+
+      assert {:error, errors} = Debts.update_category_debt(category, params_update)
+
+      assert errors = [
+               name:
+                 {"should be at least %{count} character(s)",
+                  [count: 3, validation: :length, kind: :min, type: :string]}
+             ]
+    end
+  end
+
+  describe "delete_category_debt" do
+    setup :setup_categoty_debts
+
+    test "deleta a categoria passada", context do
+      %{category: category} = context
+
+      category_id = category.id
+
+      Debts.delete_category_debt(category_id)
+
+      refute Debts.show_category_debt(category_id)
+    end
+  end
+
   defp setup_categoty_debts(_) do
     %{category: create_category_debts()}
   end

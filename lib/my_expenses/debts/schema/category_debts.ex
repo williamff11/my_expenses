@@ -7,12 +7,14 @@ defmodule MyExpenses.Debts.Schema.CategoryDebts do
 
   import Ecto.Changeset
 
+  alias MyExpenses.Debts.Schema
+
   @type t() :: %__MODULE__{
           name: String.t(),
           description: String.t(),
           icon: String.t(),
           color: String.t(),
-          inserted_at: DateTime.t(),
+          created_at: DateTime.t(),
           updated_at: DateTime.t()
         }
 
@@ -22,7 +24,13 @@ defmodule MyExpenses.Debts.Schema.CategoryDebts do
     field(:icon, :string)
     field(:color, :string)
 
-    timestamps()
+    has_many(:debts, Schema.Debts)
+
+    timestamps(
+      inserted_at: :created_at,
+      updated_at: :updated_at,
+      type: :utc_datetime
+    )
   end
 
   def changeset(%__MODULE__{} = struct, params) do

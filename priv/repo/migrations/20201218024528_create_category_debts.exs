@@ -8,7 +8,11 @@ defmodule MyExpenses.Repo.Migrations.CreateCategoryDebts do
       add(:icon, :string)
       add(:color, :string)
 
-      timestamps()
+      timestamps(
+        inserted_at: :created_at,
+        updated_at: :updated_at,
+        type: :utc_datetime
+      )
     end
     create unique_index(:category_debts, [:id], name: :IDX_CATEGORY_DEBTS_ID)
   end
