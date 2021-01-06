@@ -10,6 +10,7 @@ defmodule MyExpenses.Debts.Schema.CategoryDebts do
   alias MyExpenses.Debts.Schema
 
   @type t() :: %__MODULE__{
+          id: non_neg_integer(),
           name: String.t(),
           description: String.t(),
           icon: String.t(),

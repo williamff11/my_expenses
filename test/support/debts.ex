@@ -1,8 +1,13 @@
 defmodule MyExpenses.Support.Debts do
-  @moduledoc false
+  @moduledoc """
+  Support do contexto de dívidas
+  """
 
   alias MyExpenses.Debts.Schema
 
+  @doc """
+  Cria uma categoria de dívidas
+  """
   def create_category_debts(params \\ %{}) do
     default_params = %{
       name: Faker.Cannabis.category(),
@@ -18,10 +23,11 @@ defmodule MyExpenses.Support.Debts do
     |> MyExpenses.Repo.insert!()
   end
 
-  def create_debt(params \\ %{}) do
+  @doc """
+  Cria uma dívida associada ao usuário passado como parâmetro
+  """
+  def create_debt(user, params \\ %{}) do
     category = create_category_debts()
-
-    IO.inspect(category)
 
     default_params = %{
       description: Faker.Food.description(),
@@ -32,8 +38,8 @@ defmodule MyExpenses.Support.Debts do
       date_debt: Faker.Date.between(~D[2021-01-01], ~D[2022-12-25]),
       payed: Enum.random([true, false]),
       conta_id: Faker.UUID.v4(),
-      user_id: Faker.UUID.v4(),
-      category_debts_id: category
+      user_id: user.id,
+      category_debts_id: category.id
     }
 
     params = Enum.into(params, default_params)

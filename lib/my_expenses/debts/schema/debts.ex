@@ -24,6 +24,10 @@ defmodule MyExpenses.Debts.Schema.Debts do
           updated_at: DateTime.t()
         }
 
+  @primary_key {:id, Ecto.UUID, autogenerate: true}
+
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+
   schema "debts" do
     field :description, :string
     field :amount, :decimal
