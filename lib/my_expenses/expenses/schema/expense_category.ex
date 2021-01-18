@@ -1,13 +1,13 @@
-defmodule MyExpenses.Debts.Schema.CategoryDebts do
+defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
   @moduledoc """
-  Módulo responsável por gerenciar as categoria de dívidas do sistema
+  Módulo responsável por gerenciar as categoria de gastos do sistema
   """
 
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias MyExpenses.Debts.Schema
+  alias MyExpenses.Expenses.Schema
 
   @type t() :: %__MODULE__{
           id: non_neg_integer(),
@@ -19,13 +19,13 @@ defmodule MyExpenses.Debts.Schema.CategoryDebts do
           updated_at: DateTime.t()
         }
 
-  schema "category_debts" do
+  schema "expenses_category" do
     field(:name, :string)
     field(:description, :string)
     field(:icon, :string)
     field(:color, :string)
 
-    has_many(:debts, Schema.Debts)
+    has_many(:expense, Schema.Expense)
 
     timestamps(
       inserted_at: :created_at,

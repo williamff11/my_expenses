@@ -1,8 +1,8 @@
-defmodule MyExpenses.Repo.Migrations.CreateCategoryDebts do
+defmodule MyExpenses.Repo.Migrations.CreateCategoryExpenses do
   use Ecto.Migration
 
   def change do
-    create table(:category_debts) do
+    create table(:expenses_category) do
       add(:name, :string, size: 80)
       add(:description, :string, size: 255)
       add(:icon, :string)
@@ -14,9 +14,11 @@ defmodule MyExpenses.Repo.Migrations.CreateCategoryDebts do
         type: :utc_datetime
       )
     end
-    create unique_index(:category_debts, [:id], name: :IDX_CATEGORY_DEBTS_ID)
+
+    create unique_index(:expenses_category, [:id], name: :IDX_EXPENSES_CATEGORY_ID)
   end
+
   def down do
-    drop table(:category_debts)
+    drop table(:expenses_category)
   end
 end

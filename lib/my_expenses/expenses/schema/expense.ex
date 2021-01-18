@@ -1,13 +1,14 @@
-defmodule MyExpenses.Debts.Schema.Debts do
+defmodule MyExpenses.Expenses.Schema.Expense do
   @moduledoc """
-  Schema das dívidas
+  Schema das Gastos
   """
 
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias MyExpenses.Debts.Schema
+  alias MyExpenses.Expenses.Schema
+  alias MyExpenses.Ecto.Types
 
   @type t() :: %__MODULE__{
           description: String.t(),
@@ -15,11 +16,13 @@ defmodule MyExpenses.Debts.Schema.Debts do
           attachment: String.t(),
           tag: String.t(),
           note: DateTime.t(),
-          date_debt: Date.t(),
+          date_spend: Date.t(),
           payed: boolean(),
+          fix: boolean(),
+          frequency: :semanalmente | :quinzenalmente | :mensalmente | :anualmente,
           conta_id: binary(),
           user_id: binary(),
-          category_debts: Schema.CategoryDebts,
+          expense_category: Schema.ExpenseCategory,
           created_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -28,18 +31,20 @@ defmodule MyExpenses.Debts.Schema.Debts do
 
   @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
-  schema "debts" do
+  schema "expenses" do
     field :description, :string
     field :amount, :decimal
     field :attachment, :string
-    field :date_debt, :date
+    field :date_spend, :date
     field :payed, :boolean
+    field :fix, :boolean
+    field :frequency, Types.Atom
     field :tag, :string
     field :note, :string
     field :conta_id, :binary_id
     field :user_id, :binary_id
 
-    belongs_to :category_debts, Schema.CategoryDebts
+    belongs_to :expense_category, Schema.ExpenseCategory
 
     timestamps(
       inserted_at: :created_at,
@@ -51,23 +56,28 @@ defmodule MyExpenses.Debts.Schema.Debts do
   def create_changeset(%__MODULE__{} = struct, params) do
     options_fields = [
       :tag,
-      :note
+      :attachment,
+      :note,
+      :frequency
     ]
 
     fields_required = [
       :description,
       :amount,
-      :date_debt,
+      :date_spend,
       :payed,
+      :fix,
       :conta_id,
       :user_id,
-      :category_debts_id
+      :expense_category_id
     ]
 
     struct
     |> cast(params, fields_required ++ options_fields)
-    |> assoc_constraint(:category_debts_id)
+    |> foreign_key_constraint(:expense_category_id)
     |> validate_required(fields_required)
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:conta_id)
     |> validate_changeset()
   end
 
@@ -75,7 +85,5 @@ defmodule MyExpenses.Debts.Schema.Debts do
     changeset
     |> validate_length(:description, max: 255)
     |> validate_number(:amount, greater_than: 0)
-    |> validate_length(:phone, min: 10, max: 15)
-    |> validate_length(:cpf, min: 11, max: 14)
   end
 end

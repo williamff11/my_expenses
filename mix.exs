@@ -64,8 +64,17 @@ defmodule MyExpenses.MixProject do
     [
       setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      # "ecto.seed": [&ecto_seed/1],
+      # "myexpenses.seed": [
+      #   "run priv/repo/myexpenses/seeds.sql"
+      # ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
+
+  # defp ecto_seed(_args) do
+  #   Mix.Task.run("myexpenses.seed")
+  #   Mix.Task.reenable("tenants.load")
+  # end
 end

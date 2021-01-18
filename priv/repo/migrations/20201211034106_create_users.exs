@@ -19,9 +19,9 @@ defmodule MyExpenses.Repo.Migrations.CreateUsers do
         updated_at: :updated_at,
         type: :utc_datetime
       )
-   end
+    end
 
-   create unique_index(:users, [:cpf, :login], name: :IDX_USERS_CPF_LOGIN)
+    create unique_index(:users, [:cpf, :login], name: :IDX_USERS_CPF_LOGIN)
   end
 
   def down do
