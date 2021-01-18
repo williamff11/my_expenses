@@ -24,13 +24,13 @@ defmodule MyExpenses.Support.Accounts do
   Cria uma conta Fake.
   """
   def create_account(user, params \\ %{}) do
-    conta =
+    account =
       1..9_999_999
       |> Enum.random()
       |> to_string()
       |> String.pad_leading(7, "0")
 
-    dv_conta = Enum.random(0..8)
+    dv_account = Enum.random(0..8)
 
     initial_amount_value =
       0..1000
@@ -41,8 +41,8 @@ defmodule MyExpenses.Support.Accounts do
     institution = create_institution()
 
     default_params = %{
-      nome: Faker.Dog.PtBr.name(),
-      num_conta: "#{conta}-#{dv_conta}",
+      name: Faker.Dog.PtBr.name(),
+      num_account: "#{account}-#{dv_account}",
       description: Faker.Dog.PtBr.characteristic(),
       initial_amount_value: initial_amount_value,
       type_account: Enum.random([:corrente, :poupanca, :salario, :investimento]),
