@@ -13,6 +13,10 @@ defmodule MyExpenses.Accounts.Query.AccountsQuery do
     from acc in Schema.Account, where: ^conditions
   end
 
+  def get_account(user_id, account_id) do
+    from acc in Schema.Account, where: acc.user_id == ^user_id and acc.id == ^account_id
+  end
+
   defp build_filter(params) do
     %{user_id: user_id} = params
 

@@ -9,6 +9,14 @@ defmodule MyExpenses.AccountsTest do
   alias MyExpenses.Accounts
   alias MyExpenses.Accounts.Schema
 
+  describe "list_institutions/0" do
+    setup :setup_institution
+
+    test "lista todas as instituicoes cadatradas", context do
+      assert [%Schema.Institution{}] = Accounts.list_institutions()
+    end
+  end
+
   describe "list_accounts_by/1" do
     setup :setup_account
 
@@ -21,6 +29,8 @@ defmodule MyExpenses.AccountsTest do
     test "lista todas as contas do usuário", context do
       %{user: user, account: account} = context
 
+      create_account(user)
+
       user_id = user.id
 
       assert [
@@ -32,6 +42,9 @@ defmodule MyExpenses.AccountsTest do
                  type_account: _,
                  user_id: user_id,
                  institution: %Schema.Institution{}
+               },
+               %Schema.Account{
+                 user_id: user_id
                }
              ] = Accounts.list_accounts_by(%{user_id: user_id})
     end
@@ -67,11 +80,191 @@ defmodule MyExpenses.AccountsTest do
     end
   end
 
+  describe "show_accounts_by/2" do
+    setup :setup_account
+
+    test "retorna nil caso o usuario informado não seja o dono da conta", context do
+      %{account: account} = context
+      user = create_user()
+
+      refute Accounts.show_account(user.id, account.id)
+    end
+
+    test "retorna nil caso a conta informada não seja do dono da conta", context do
+      %{user: user} = context
+
+      outher_user = create_user()
+      account = create_account(outher_user)
+
+      refute Accounts.show_account(user.id, account.id)
+    end
+
+    test "retorna a conta caso o usuario seja dono da conta", context do
+      %{user: user, account: account} = context
+
+      account_id = account.id
+      user_id = user.id
+
+      assert %Schema.Account{
+               id: account_id,
+               name: _,
+               num_account: _,
+               type_account: _,
+               institution_id: _,
+               description: _,
+               initial_amount_value: _,
+               user_id: user_id
+             } = Accounts.show_account(user.id, account.id)
+    end
+  end
+
+  describe "create_account/2" do
+    setup :setup_account
+
+    test "erro ao tentar cadastrar uma conta com os dados inválidos", context do
+      %{user: user} = context
+
+      institution = create_institution()
+
+      params = %{
+        name: "AB",
+        num_account: "00-0",
+        type_account: :type_random,
+        institution_id: institution.id,
+        description: "Erro ao tentar criar",
+        initial_amount_value: 0
+      }
+
+      assert {:error, errors} = Accounts.create_account(user.id, params)
+
+      assert [
+               num_account: {"should be at least %{count} character(s)", _},
+               name: {"should be at least %{count} character(s)", _},
+               type_account: {"is invalid", _}
+             ] = errors.errors
+    end
+
+    test "cria conta conforme os parâmetros informados", context do
+      %{user: user} = context
+
+      institution = create_institution()
+
+      institution_id = institution.id
+
+      params = %{
+        name: "Account Test",
+        num_account: "0076416-7",
+        type_account: :corrente,
+        institution_id: institution.id,
+        description: "Sucess",
+        initial_amount_value: 100
+      }
+
+      account = Accounts.create_account(user.id, params)
+
+      amount_value = Decimal.new(100)
+
+      assert {:ok,
+              %Schema.Account{
+                name: "Account Test",
+                num_account: "0076416-7",
+                type_account: :corrente,
+                institution_id: institution_id,
+                description: "Sucess",
+                initial_amount_value: amount_value
+              }} = account
+    end
+  end
+
+  describe "update_account/2" do
+    setup :setup_account
+
+    test "erro ao passar uma conta que não pertence ao usuário informado", context do
+      %{account: account} = context
+
+      user = create_user()
+
+      params = %{name: "change_name"}
+
+      assert_raise RuntimeError, "account not found", fn ->
+        Accounts.update_account(user.id, account.id, params)
+      end
+    end
+
+    test "erro ao passar parâmetros inválidos", context do
+      %{user: user, account: account} = context
+
+      params = %{
+        name: "change_name",
+        num_account: "00-0",
+        type_account: :agiotagem
+      }
+
+      assert {:error, errors} = Accounts.update_account(user.id, account.id, params)
+
+      assert [
+               num_account: {"should be at least %{count} character(s)", _},
+               type_account: {"is invalid", _}
+             ] = errors.errors
+    end
+
+    test "atualiza a conta conforme os parâmetros", context do
+      %{user: user, account: account} = context
+
+      params = %{
+        name: "change_name",
+        num_account: "0076416-7",
+        type_account: :salario
+      }
+
+      assert {:ok,
+              %Schema.Account{
+                name: "change_name",
+                num_account: "0076416-7",
+                type_account: :salario,
+                institution_id: _,
+                description: _,
+                initial_amount_value: _
+              }} = Accounts.update_account(user.id, account.id, params)
+    end
+  end
+
+  describe "delete_account/2" do
+    setup :setup_account
+
+    test "erro ao passar uma conta que não pertence ao usuário informado", context do
+      %{account: account} = context
+
+      user = create_user()
+
+      assert_raise RuntimeError, "account not found", fn ->
+        Accounts.delete_account(user.id, account.id)
+      end
+    end
+
+    test "deleta a conta informada", context do
+      %{user: user, account: account} = context
+
+      account_id = account.id
+      user_id = user.id
+
+      assert {:ok,
+              %Schema.Account{
+                id: account_id,
+                user_id: user_id
+              }} = Accounts.delete_account(user_id, account_id)
+    end
+  end
+
   defp setup_account(_) do
     user = create_user()
 
     account = create_account(user)
 
     %{user: user, account: account}
+  end
+
+  defp setup_institution(_) do
+    %{institution: create_institution()}
   end
 end

@@ -43,7 +43,7 @@ defmodule MyExpenses.Accounts.Schema.Account do
     )
   end
 
-  def create_changeset(%__MODULE__{} = struct, params) do
+  def changeset(%__MODULE__{} = struct, params) do
     options_fields = [
       :description,
       :institution_id
@@ -67,7 +67,7 @@ defmodule MyExpenses.Accounts.Schema.Account do
 
   defp validate_changeset(changeset) do
     changeset
-    |> validate_length(:nome, min: 3, max: 80)
+    |> validate_length(:name, min: 3, max: 80)
     |> validate_length(:num_account, min: 5, max: 20)
   end
 end
