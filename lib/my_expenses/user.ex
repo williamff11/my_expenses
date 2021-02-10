@@ -24,7 +24,7 @@ defmodule MyExpenses.User do
   Lista usuário(s) conforme paramêtro
   """
   @spec list_users() :: [User.t()]
-  def list_users() do
+  def list_users do
     Query.UserQuery.all_users()
     |> MyExpenses.Repo.all()
   end
@@ -33,7 +33,7 @@ defmodule MyExpenses.User do
   Lista somente os usuários deletados
   """
   @spec list_only_trash() :: [%User{deleted_at: nil}]
-  def list_only_trash() do
+  def list_only_trash do
     Query.UserQuery.only_trash()
     |> MyExpenses.Repo.all()
   end

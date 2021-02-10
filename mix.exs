@@ -10,7 +10,21 @@ defmodule MyExpenses.MixProject do
       compilers: [:phoenix, :gettext] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+
+      # Coveralls
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+
+      # Docs
+      name: "My_Expenses",
+      source_url: "https://github.com/williamff11/my_expenses",
+      docs: [main: "My_Expenses", extras: ["README.md"]]
     ]
   end
 
@@ -49,6 +63,8 @@ defmodule MyExpenses.MixProject do
       {:uuid, "~> 1.1.8"},
       {:brcpfcnpj, "~> 0.1.0", only: [:dev, :test]},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.10", only: :test},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:faker, "~> 0.15", only: [:dev, :test]}
     ]
@@ -64,8 +80,17 @@ defmodule MyExpenses.MixProject do
     [
       setup: ["deps.get", "ecto.setup", "cmd npm install --prefix assets"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      # "ecto.seed": [&ecto_seed/1],
+      # "myexpenses.seed": [
+      #   "run priv/repo/myexpenses/seeds.sql"
+      # ],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
+
+  # defp ecto_seed(_args) do
+  #   Mix.Task.run("myexpenses.seed")
+  #   Mix.Task.reenable("tenants.load")
+  # end
 end

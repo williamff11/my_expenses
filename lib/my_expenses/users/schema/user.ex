@@ -43,7 +43,7 @@ defmodule MyExpenses.Users.Schema.User do
     )
   end
 
-  def create_changeset(struct, params) do
+  def create_changeset(%__MODULE__{} = struct, params) do
     fields = [
       :name,
       :email,
@@ -59,7 +59,7 @@ defmodule MyExpenses.Users.Schema.User do
     |> validate_changeset(fields)
   end
 
-  def update_changeset(struct, params) do
+  def update_changeset(%__MODULE__{} = struct, params) do
     fields = [:email, :phone, :password]
 
     struct

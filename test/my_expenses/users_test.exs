@@ -27,7 +27,7 @@ defmodule MyExpenses.UserTest do
                }
              ] = User.list_users()
 
-      new_usuario = insert_user()
+      new_usuario = create_user()
 
       User.delete_user(new_usuario)
 
@@ -99,8 +99,7 @@ defmodule MyExpenses.UserTest do
              } = User.show_user(user_id)
 
       User.delete_user(user)
-
-      assert User.show_user(user_id) == nil
+      refute User.show_user(user_id)
     end
 
     test "show usuario deletado", context do
@@ -211,6 +210,6 @@ defmodule MyExpenses.UserTest do
   end
 
   defp setup_user(_) do
-    %{user: insert_user()}
+    %{user: create_user()}
   end
 end

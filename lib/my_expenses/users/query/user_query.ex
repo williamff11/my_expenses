@@ -5,7 +5,7 @@ defmodule MyExpenses.Users.Query.UserQuery do
 
   alias MyExpenses.Users.Schema.User
 
-  def all_users() do
+  def all_users do
     from user in User, where: is_nil(user.deleted_at)
   end
 
@@ -13,7 +13,7 @@ defmodule MyExpenses.Users.Query.UserQuery do
     from user in User, where: user.id == ^user_id and is_nil(user.deleted_at)
   end
 
-  def only_trash() do
+  def only_trash do
     from user in User, where: not is_nil(user.deleted_at)
   end
 
