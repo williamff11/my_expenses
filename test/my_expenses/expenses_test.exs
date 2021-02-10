@@ -3,6 +3,7 @@ defmodule MyExpenses.ExpensesTest do
 
   use MyExpenses.Support.DataCase, async: true
 
+  import MyExpenses.Support.Accounts
   import MyExpenses.Support.Expenses
   import MyExpenses.Support.Users
 
@@ -26,11 +27,6 @@ defmodule MyExpenses.ExpensesTest do
                  color: _
                }
              ] = Expenses.list_expense_category()
-    end
-
-    @tag :skip
-    test "lista somente as categorias onde o usuário possui gastos" do
-      :not_implemeted
     end
   end
 
@@ -136,7 +132,10 @@ defmodule MyExpenses.ExpensesTest do
 
       category_id = category.id
 
-      Expenses.delete_expense_category(category_id)
+      assert {
+               :ok,
+               %Schema.ExpenseCategory{id: expense_id}
+             } = Expenses.delete_expense_category(category_id)
 
       refute Expenses.show_expense_category(category_id)
     end
@@ -146,9 +145,10 @@ defmodule MyExpenses.ExpensesTest do
     setup :setup_expenses
 
     test "lista todas os gastos cadastradas por certo usuário", context do
-      %{user: user, expense: expense} = context
+      %{user: user, account: account, expense: expense} = context
 
       user_id = user.id
+      account_id = account.id
 
       assert [
                %Schema.Expense{
@@ -161,28 +161,11 @@ defmodule MyExpenses.ExpensesTest do
                  payed: _,
                  fix: _,
                  frequency: _,
-                 conta_id: _,
+                 account_id: account_id,
                  user_id: user_id,
                  expense_category: %{}
                }
-             ] = Expenses.list_expenses_by(%{user_id: user_id})
-    end
-
-    test "lista todas os gastos que são fixos", context do
-      %{user: user} = context
-
-      create_expense(user, %{fix: true, frequency: :mensalmente})
-
-      assert [
-               %Schema.Expense{
-                 fix: true,
-                 frequency: frequency,
-                 expense_category: %{}
-               }
-               | _
-             ] = Expenses.list_expenses_fixed()
-
-      assert frequency
+             ] = Expenses.list_expenses_by(%{user_id: user_id, account_id: account_id})
     end
 
     test "lista os gastos conformes parâmetros informados", context do
@@ -205,7 +188,7 @@ defmodule MyExpenses.ExpensesTest do
                  payed: _,
                  fix: _,
                  frequency: _,
-                 conta_id: _,
+                 account_id: _,
                  user_id: user_id,
                  expense_category: %{id: expense_category_id}
                }
@@ -243,6 +226,125 @@ defmodule MyExpenses.ExpensesTest do
     end
   end
 
+  describe "list_expenses_fixed_by/1" do
+    setup :setup_expenses_fixed
+
+    test "lista todos os gastos cadastrados que são fixos", context do
+      %{user: user} = context
+
+      create_expense(user, %{fix: true, frequency: :mensalmente})
+
+      assert [
+               %Schema.Expense{
+                 fix: true,
+                 frequency: :mensalmente,
+                 expense_category: %{}
+               }
+               | _
+             ] = Expenses.list_expenses_fixed_by()
+    end
+
+    test "lista todos os gastos fixos do usuário", context do
+      %{user: user, account: account} = context
+
+      user_id = user.id
+      account_id = account.id
+
+      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+
+      another_account = create_account(user)
+      another_account_id = another_account.id
+
+      create_expense(user, %{fix: true, account_id: another_account_id, frequency: :semanalmente})
+
+      assert [
+               %Schema.Expense{
+                 fix: true,
+                 frequency: _,
+                 account_id: account_id,
+                 user_id: user_id,
+                 expense_category: %{}
+               },
+               %Schema.Expense{
+                 fix: true,
+                 frequency: _,
+                 account_id: another_account_id,
+                 user_id: user_id,
+                 expense_category: %{}
+               }
+               | _
+             ] = Expenses.list_expenses_fixed_by(%{user_id: user_id})
+    end
+
+    test "lista todos os gastos fixos por conta do usuário", context do
+      %{user: user, account: account} = context
+
+      user_id = user.id
+      account_id = account.id
+
+      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+
+      another_account = create_account(user)
+      another_account_id = another_account.id
+
+      create_expense(user, %{fix: true, account_id: another_account_id, frequency: :semanalmente})
+
+      assert [
+               %Schema.Expense{
+                 fix: true,
+                 frequency: :mensalmente,
+                 account_id: account_id,
+                 user_id: user_id,
+                 expense_category: %{}
+               }
+             ] =
+               Expenses.list_expenses_fixed_by(%{
+                 user_id: user_id,
+                 account_id: account_id,
+                 fix: true
+               })
+
+      assert [
+               %Schema.Expense{
+                 fix: true,
+                 frequency: :semanalmente,
+                 account_id: another_account_id,
+                 user_id: user_id,
+                 expense_category: %{}
+               }
+             ] =
+               Expenses.list_expenses_fixed_by(%{
+                 user_id: user_id,
+                 account_id: another_account_id,
+                 fix: true
+               })
+    end
+
+    test "lista todos os gastos fixos que correspondem à frequência informada", context do
+      %{user: user, account: account} = context
+
+      user_id = user.id
+      account_id = account.id
+
+      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+
+      assert [
+               %Schema.Expense{
+                 fix: true,
+                 frequency: :mensalmente,
+                 account_id: account_id,
+                 user_id: user_id,
+                 expense_category: %{}
+               }
+             ] =
+               Expenses.list_expenses_fixed_by(%{
+                 user_id: user_id,
+                 frequency: :mensalmente,
+                 fix: true
+               })
+    end
+  end
+
   describe "show_expenses/2" do
     setup :setup_expenses
 
@@ -263,7 +365,7 @@ defmodule MyExpenses.ExpensesTest do
                payed: _,
                fix: _,
                frequency: _,
-               conta_id: _,
+               account_id: _,
                user_id: user_id,
                expense_category: %{id: expense_category_id}
              } = Expenses.show_expense(expense.id)
@@ -274,13 +376,14 @@ defmodule MyExpenses.ExpensesTest do
     end
   end
 
-  describe "create_expenses/1" do
-    setup :setup_user
+  describe "create_expense/2" do
+    setup :setup_account
     setup :setup_categoty_expenses
 
     test "cria um gasto conforme os parâmetros informados", context do
-      %{user: user, category: category} = context
+      %{account: account, category: category, user: user} = context
 
+      account_id = account.id
       user_id = user.id
 
       params = %{
@@ -292,7 +395,7 @@ defmodule MyExpenses.ExpensesTest do
         date_spend: ~D[2021-01-26],
         payed: true,
         fix: false,
-        conta_id: "d6d98b88-c866-4496-9bd4-de7ba48d0f52",
+        account_id: account_id,
         user_id: user_id
       }
 
@@ -302,14 +405,15 @@ defmodule MyExpenses.ExpensesTest do
               %Schema.Expense{
                 payed: true,
                 fix: false,
-                conta_id: _,
+                account_id: account_id,
                 user_id: user_id
               }} = Expenses.create_expense(category, params)
     end
 
     test "cria um gasto somente com os dados básicos", context do
-      %{user: user, category: category} = context
+      %{account: account, category: category, user: user} = context
 
+      account_id = account.id
       user_id = user.id
 
       params = %{
@@ -318,7 +422,7 @@ defmodule MyExpenses.ExpensesTest do
         date_spend: ~D[2021-01-26],
         payed: true,
         fix: false,
-        conta_id: "d6d98b88-c866-4496-9bd4-de7ba48d0f52",
+        account_id: account_id,
         user_id: user_id
       }
 
@@ -328,7 +432,7 @@ defmodule MyExpenses.ExpensesTest do
               %Schema.Expense{
                 payed: true,
                 fix: false,
-                conta_id: _,
+                account_id: account_id,
                 user_id: user_id
               }} = Expenses.create_expense(category, params)
     end
@@ -354,25 +458,143 @@ defmodule MyExpenses.ExpensesTest do
                  description: {"can't be blank", [validation: :required]},
                  payed: {"can't be blank", [validation: :required]},
                  fix: {"can't be blank", [validation: :required]},
-                 conta_id: {"can't be blank", [validation: :required]},
+                 account_id: {"can't be blank", [validation: :required]},
                  user_id: {"is invalid", [type: :binary_id, validation: :cast]}
                ] = errors
     end
   end
 
-  defp setup_expenses(_) do
-    user = create_user()
+  describe "update_expense/2" do
+    setup :setup_expenses
 
-    expense = create_expense(user)
+    test "realiza um update na conta conforme os parâmetros", context do
+      %{expense: expense, user: user} = context
 
-    %{user: user, expense: expense}
+      expense_id = expense.id
+      user_id = user.id
+
+      params = %{
+        date_spend: ~D[2019-09-20],
+        tag: "shoes"
+      }
+
+      assert {:ok,
+              %Schema.Expense{
+                id: expense_id,
+                date_spend: ~D[2019-09-20],
+                tag: "shoes",
+                user_id: user_id
+              }} = Expenses.update_expense(expense, params)
+    end
+
+    test "realiza um update trocando a conta do gasto", context do
+      %{expense: expense, user: user} = context
+
+      another_account_id = create_account(user).id
+      expense_id = expense.id
+      user_id = user.id
+
+      params = %{
+        account_id: another_account_id
+      }
+
+      assert {:ok,
+              %Schema.Expense{
+                id: expense_id,
+                account_id: another_account_id,
+                user_id: user_id
+              }} = Expenses.update_expense(expense, params)
+    end
+
+    test "erro ao tentar raelizar update com os parâmtros inválidos", context do
+      %{expense: expense, user: user} = context
+
+      params = %{
+        amount: 0,
+        date_spend: ~D[2021-01-26],
+        payed: nil,
+        fix: nil,
+        account_id: 0
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Expenses.update_expense(expense, params)
+
+      assert errors:
+               [
+                 amount: {"must be greater than %{number}", _},
+                 payed: {"can't be blank", [validation: :required]},
+                 fix: {"can't be blank", [validation: :required]},
+                 account_id: {"is invalid", [type: :binary_id, validation: :cast]}
+               ] = errors
+    end
   end
 
-  defp setup_user(_) do
-    %{user: create_user()}
+  describe "list_expense_category_by_user/1" do
+    setup :create_many_expenses
+
+    test "lista somente as categoria de gastos do usuário", context do
+      %{user: user, account: account, expense: expense} = context
+
+      expenses_category =
+        user
+        |> Expenses.list_expense_category_by_user()
+
+      IO.inspect(expenses_category, label: "👀👀👀👀")
+    end
+  end
+
+  describe "delete_expense/2" do
+    setup :setup_expenses
+
+    test "deleta de forma lógica o gasto", context do
+      %{expense: expense, user: user} = context
+
+      expense_id = expense.id
+      assert {:ok, %Schema.Expense{id: expense_id}} = Expenses.delete_expense(expense)
+
+      refute Expenses.show_expense(expense_id)
+    end
+  end
+
+  def setup_account(_) do
+    user = create_user()
+
+    account = create_account(user)
+
+    %{user: user, account: account}
   end
 
   defp setup_categoty_expenses(_) do
     %{category: create_expense_category()}
+  end
+
+  defp setup_expenses(_) do
+    user = create_user()
+
+    account = create_account(user)
+
+    expense = create_expense(user, %{account_id: account.id})
+
+    %{user: user, account: account, expense: expense}
+  end
+
+  defp setup_expenses_fixed(_) do
+    user = create_user()
+
+    account = create_account(user)
+
+    %{user: user, account: account}
+  end
+
+  defp create_many_expenses(_) do
+    %{user: user, account: account, expense: expense} = setup_expenses([])
+
+    another_account = create_account(user)
+
+    account_of_expense = Enum.random([account, another_account])
+
+    Enum.each(1..7, fn x -> create_expense(user, %{account_id: account_of_expense.id}) end)
+
+    %{user: user, account: account, expense: expense}
   end
 end

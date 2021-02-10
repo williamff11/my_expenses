@@ -2,6 +2,7 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
   @moduledoc """
   Módulo responsável por gerenciar as categoria de gastos do sistema
   """
+  @behaviour Access
 
   use Ecto.Schema
 
@@ -32,6 +33,11 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
       updated_at: :updated_at,
       type: :utc_datetime
     )
+  end
+
+  @impl Access
+  def fetch(%__MODULE__{} = struct, key) do
+    Map.fetch(struct, key)
   end
 
   def changeset(%__MODULE__{} = struct, params) do

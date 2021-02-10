@@ -22,7 +22,7 @@ defmodule MyExpenses.Expenses do
           date_spend: Date.t(),
           payed: boolean(),
           fix: boolean(),
-          conta_id: UUID.t(),
+          account_id: UUID.t(),
           user_id: UUID.t()
         }
 
@@ -30,7 +30,7 @@ defmodule MyExpenses.Expenses do
 
   @type expenses_filter_params() :: %{
           user_id: UUID.t(),
-          conta_id: UUID.t(),
+          account_id: UUID.t(),
           expense_category_id: non_neg_integer()
         }
 
@@ -49,8 +49,12 @@ defmodule MyExpenses.Expenses do
     |> MyExpenses.Repo.all()
   end
 
-  def list_expenses_fixed() do
-    ExpensesQuery.get_expenses_fixed_by()
+  @doc """
+  Lista todas os gastos que são fixos conforme os parâmetros.
+  """
+  @spec list_expenses_fixed_by(%{}) :: [%Schema.Expense{}] | nil
+  def list_expenses_fixed_by(params \\ %{}) do
+    ExpensesQuery.get_expenses_fixed_by(params)
     |> MyExpenses.Repo.all()
     |> MyExpenses.Repo.preload(:expense_category)
   end
@@ -58,8 +62,10 @@ defmodule MyExpenses.Expenses do
   @doc """
   Lista todas as categorias de gastos que o usuário passado como argumento possui gastos.
   """
-  def list_expense_category_by_user(_user_id) do
-    :not_implemented
+  def list_expense_category_by_user(user) do
+    %{user_id: user.id}
+    |> list_expenses_by()
+    |> get_in([Access.all(), :expense_category, :id])
   end
 
   @doc """
@@ -108,7 +114,6 @@ defmodule MyExpenses.Expenses do
 
   A key user_id é obrigatória.
   """
-  @spec list_expenses_by(expenses_filter_params) :: [Schema.Expenses.t()] | []
   def list_expenses_by(params) do
     if not (:user_id in Map.keys(params)), do: raise("key user_id is required")
 
@@ -122,9 +127,9 @@ defmodule MyExpenses.Expenses do
   Mostra o gasto que possui o ID informado
   """
   @spec show_expense(id: UUID.t()) :: Schema.Expense.t() | nil
-  def show_expense(expense_id) do
-    Schema.Expense
-    |> MyExpenses.Repo.get(expense_id)
+  def show_expense(id) do
+    ExpensesQuery.get_expenses_by(%{id: id, deleted_at: false})
+    |> MyExpenses.Repo.one()
     |> MyExpenses.Repo.preload(:expense_category)
   end
 
@@ -138,5 +143,27 @@ defmodule MyExpenses.Expenses do
     }
     |> Schema.Expense.create_changeset(params)
     |> MyExpenses.Repo.insert()
+  end
+
+  @doc """
+  Realiza um update no gasto informado com os dados informados passados como parâmetro
+  """
+  @spec update_expense(Schema.Expense.t(), expenses_params()) :: callback_expenses()
+  def update_expense(%Schema.Expense{} = expense, %{} = params) do
+    expense
+    |> Schema.Expense.update_changeset(params)
+    |> MyExpenses.Repo.update()
+  end
+
+  @doc """
+  Deleta de forma lógica um gasto.
+  """
+  @spec delete_expense(Schema.Expense.t()) :: callback_expenses()
+  def delete_expense(%Schema.Expense{} = expense) do
+    deleted_at = DateTime.truncate(Timex.now(), :second)
+
+    expense
+    |> Ecto.Changeset.change(%{deleted_at: deleted_at})
+    |> MyExpenses.Repo.update()
   end
 end

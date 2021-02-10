@@ -16,9 +16,11 @@ defmodule MyExpenses.Repo.Migrations.CreateExpenses do
       add(:fix, :boolean, null: false)
       add(:frequency, :string, null: true)
 
-      add(:conta_id, :uuid)
+      add(:account_id, :uuid)
       add(:user_id, :uuid)
       add(:expense_category_id, references(:expenses_category))
+
+      add(:deleted_at, :utc_datetime, null: true)
 
       timestamps(
         inserted_at: :created_at,
@@ -31,8 +33,7 @@ defmodule MyExpenses.Repo.Migrations.CreateExpenses do
              :expenses,
              [
                :id,
-               :conta_id,
-               :user_id,
+               :account_id,
                :expense_category_id
              ]
            )

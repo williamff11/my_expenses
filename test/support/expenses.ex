@@ -46,7 +46,7 @@ defmodule MyExpenses.Support.Expenses do
       payed: Enum.random([true, false]),
       fix: boolean_fix,
       frequency: frequency,
-      conta_id: Faker.UUID.v4(),
+      account_id: Faker.UUID.v4(),
       user_id: user.id,
       expense_category_id: category.id
     }

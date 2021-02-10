@@ -2,13 +2,14 @@ defmodule MyExpenses.Expenses.Schema.Expense do
   @moduledoc """
   Schema das Gastos
   """
+  @behaviour Access
 
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias MyExpenses.Expenses.Schema
   alias MyExpenses.Ecto.Types
+  alias MyExpenses.Expenses.Schema
 
   @type t() :: %__MODULE__{
           description: String.t(),
@@ -20,9 +21,10 @@ defmodule MyExpenses.Expenses.Schema.Expense do
           payed: boolean(),
           fix: boolean(),
           frequency: :semanalmente | :quinzenalmente | :mensalmente | :anualmente,
-          conta_id: binary(),
+          account_id: binary(),
           user_id: binary(),
           expense_category: Schema.ExpenseCategory,
+          deleted_at: DateTime.t(),
           created_at: DateTime.t(),
           updated_at: DateTime.t()
         }
@@ -41,16 +43,23 @@ defmodule MyExpenses.Expenses.Schema.Expense do
     field :frequency, Types.Atom
     field :tag, :string
     field :note, :string
-    field :conta_id, :binary_id
+    field :account_id, :binary_id
     field :user_id, :binary_id
 
     belongs_to :expense_category, Schema.ExpenseCategory
+
+    field :deleted_at, :utc_datetime
 
     timestamps(
       inserted_at: :created_at,
       updated_at: :updated_at,
       type: :utc_datetime
     )
+  end
+
+  @impl Access
+  def fetch(%__MODULE__{} = struct, key) do
+    Map.fetch(struct, key)
   end
 
   def create_changeset(%__MODULE__{} = struct, params) do
@@ -67,23 +76,54 @@ defmodule MyExpenses.Expenses.Schema.Expense do
       :date_spend,
       :payed,
       :fix,
-      :conta_id,
+      :account_id,
       :user_id,
       :expense_category_id
     ]
 
     struct
     |> cast(params, fields_required ++ options_fields)
-    |> foreign_key_constraint(:expense_category_id)
-    |> validate_required(fields_required)
-    |> foreign_key_constraint(:user_id)
-    |> foreign_key_constraint(:conta_id)
+    |> validate_changeset()
+  end
+
+  def update_changeset(%__MODULE__{} = struct, params) do
+    fields = [
+      :description,
+      :amount,
+      :date_spend,
+      :payed,
+      :fix,
+      :account_id,
+      :tag,
+      :attachment,
+      :note,
+      :frequency,
+      :expense_category_id
+    ]
+
+    struct
+    |> cast(params, fields)
     |> validate_changeset()
   end
 
   defp validate_changeset(changeset) do
+    fields_required = [
+      :description,
+      :amount,
+      :date_spend,
+      :payed,
+      :fix,
+      :account_id,
+      :user_id,
+      :expense_category_id
+    ]
+
     changeset
+    |> validate_required(fields_required)
     |> validate_length(:description, max: 255)
     |> validate_number(:amount, greater_than: 0)
+    |> foreign_key_constraint(:expense_category_id)
+    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:account_id)
   end
 end

@@ -16,7 +16,7 @@ defmodule MyExpenses.Expenses.Query.ExpensesQuery do
   """
   @spec get_expenses_by(%{
           user_id: UUID.t(),
-          conta_id: UUID.t() | nil,
+          account_id: UUID.t() | nil,
           expenses_category: non_neg_integer() | nil
         }) :: Ecto.Query.t()
   def get_expenses_by(%{} = params) do
@@ -25,19 +25,41 @@ defmodule MyExpenses.Expenses.Query.ExpensesQuery do
     from query in Schema.Expense, where: ^conditions
   end
 
-  def get_expenses_fixed_by() do
-    from expense in Schema.Expense, where: expense.fix == true
+  def get_expenses_fixed_by(params \\ %{}) do
+    if params == %{} do
+      from expense in Schema.Expense, where: expense.fix == true
+    else
+      conditions = build_filter(params)
+
+      from expense in Schema.Expense, where: ^conditions
+    end
   end
 
   defp build_filter(params) do
-    %{user_id: user_id} = params
+    Enum.reduce(params, dynamic([expense], true == true), fn
+      {:id, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.id == ^value)
 
-    Enum.reduce(params, dynamic([expense], expense.user_id == ^user_id), fn
-      {:conta_id, value}, dynamic ->
-        dynamic([expense], ^dynamic and expense.conta_id == ^value)
+      {:account_id, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.account_id == ^value)
+
+      {:user_id, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.user_id == ^value)
+
+      {:frequency, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.frequency == ^value)
 
       {:expenses_category_id, value}, dynamic ->
         dynamic([expense], ^dynamic and expense.expenses_category_id == ^value)
+
+      {:fix, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.fix == ^value)
+
+      {:deleted_at, false}, dynamic ->
+        dynamic([expense], ^dynamic and is_nil(expense.deleted_at))
+
+      {:deleted_at, true}, dynamic ->
+        dynamic([expense], ^dynamic and not is_nil(expense.deleted_at))
 
       {_, _}, dynamic ->
         dynamic
