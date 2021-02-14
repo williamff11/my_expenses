@@ -62,10 +62,12 @@ defmodule MyExpenses.Expenses do
   @doc """
   Lista todas as categorias de gastos que o usuário passado como argumento possui gastos.
   """
+  @spec list_expense_category_by_user(User) :: [Schema.Expense.t()] | []
   def list_expense_category_by_user(user) do
     %{user_id: user.id}
     |> list_expenses_by()
-    |> get_in([Access.all(), :expense_category, :id])
+    |> get_in([Access.all(), :expense_category])
+    |> Enum.uniq()
   end
 
   @doc """

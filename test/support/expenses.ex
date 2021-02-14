@@ -26,8 +26,12 @@ defmodule MyExpenses.Support.Expenses do
   @doc """
   Cria um gasto associado ao usuário passado como parâmetro.
   """
-  def create_expense(user, params \\ %{}) do
-    category = create_expense_category()
+  def create_expense(user, params \\ %{}, category \\ %{}) do
+    category =
+      case category do
+        %Schema.ExpenseCategory{} -> category
+        %{} -> create_expense_category()
+      end
 
     boolean_fix = Enum.random([true, false])
 
