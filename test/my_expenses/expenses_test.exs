@@ -533,13 +533,14 @@ defmodule MyExpenses.ExpensesTest do
     setup :create_many_expenses
 
     test "lista somente as categoria de gastos do usuário", context do
-      %{user: user, account: account, expense: expense} = context
+      %{user: user, account: account} = context
 
-      expenses_category =
-        user
-        |> Expenses.list_expense_category_by_user()
+      expenses_categories = Expenses.list_expense_category_by_user(user)
 
-      IO.inspect(expenses_category, label: "👀👀👀👀")
+      assert [
+               %Schema.ExpenseCategory{}
+               | _
+             ] = expenses_categories
     end
   end
 
@@ -593,7 +594,15 @@ defmodule MyExpenses.ExpensesTest do
 
     account_of_expense = Enum.random([account, another_account])
 
-    Enum.each(1..7, fn x -> create_expense(user, %{account_id: account_of_expense.id}) end)
+    expense_category = expense.expense_category
+
+    Enum.each(1..7, fn x ->
+      if Enum.random([false, true]) do
+        create_expense(user, %{account_id: account_of_expense.id}, expense_category)
+      else
+        create_expense(user, %{account_id: account_of_expense.id})
+      end
+    end)
 
     %{user: user, account: account, expense: expense}
   end

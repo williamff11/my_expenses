@@ -63,6 +63,7 @@ defmodule MyExpenses.MixProject do
       {:uuid, "~> 1.1.8"},
       {:brcpfcnpj, "~> 0.1.0", only: [:dev, :test]},
       {:credo, "~> 1.5", only: [:dev, :test], runtime: false},
+      {:doctor, "~> 0.17.0", only: :dev},
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:excoveralls, "~> 0.10", only: :test},
       {:phoenix_live_reload, "~> 1.2", only: :dev},

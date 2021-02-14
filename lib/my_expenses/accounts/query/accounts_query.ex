@@ -7,6 +7,20 @@ defmodule MyExpenses.Accounts.Query.AccountsQuery do
 
   alias MyExpenses.Accounts.Schema
 
+  @type account_quey_params() :: %{
+          user_id: UUID.t(),
+          name: String.t(),
+          num_account: String.t(),
+          type_account: :corrente | :poupanca | :salario | :investimento,
+          institution_id: non_neg_integer()
+        }
+
+  @doc """
+  Retorna uma conta conforme os parâmetros informados.
+
+  Espera um map como parâmetro.
+  """
+  @spec list_accounts_by(account_quey_params()) :: [%Schema.Account{}] | nil
   def list_accounts_by(%{} = params) do
     conditions = build_filter(params)
 
