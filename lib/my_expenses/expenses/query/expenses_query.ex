@@ -7,7 +7,7 @@ defmodule MyExpenses.Expenses.Query.ExpensesQuery do
 
   alias MyExpenses.Expenses.Schema
 
-  def get_expense_categorys do
+  def get_expense_categories do
     from(expenses_category in Schema.ExpenseCategory)
   end
 

@@ -45,7 +45,7 @@ defmodule MyExpenses.Expenses do
   """
   @spec list_expense_category() :: [Schema.ExpenseCategory.t()] | []
   def list_expense_category do
-    ExpensesQuery.get_expense_categorys()
+    ExpensesQuery.get_expense_categories()
     |> MyExpenses.Repo.all()
   end
 

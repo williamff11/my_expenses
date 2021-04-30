@@ -11,7 +11,7 @@ defmodule MyExpenses.ExpensesTest do
   alias MyExpenses.Expenses.Schema
 
   describe "list_expense_categorys" do
-    setup :setup_categoty_expenses
+    setup :setup_category_expenses
 
     test "listagem das categorias de gastos", context do
       %{category: category} = context
@@ -31,7 +31,7 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "show_expense_category" do
-    setup :setup_categoty_expenses
+    setup :setup_category_expenses
 
     test "retorna nil ao passar uma categoria que não existe" do
       refute Expenses.show_expense_category(0)
@@ -88,7 +88,7 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "update_expense_category" do
-    setup :setup_categoty_expenses
+    setup :setup_category_expenses
 
     test "edita a categoria conforme os dados passados", context do
       %{category: category} = context
@@ -125,7 +125,7 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "delete_expense_category" do
-    setup :setup_categoty_expenses
+    setup :setup_category_expenses
 
     test "deleta a categoria passada", context do
       %{category: category} = context
@@ -378,7 +378,7 @@ defmodule MyExpenses.ExpensesTest do
 
   describe "create_expense/2" do
     setup :setup_account
-    setup :setup_categoty_expenses
+    setup :setup_category_expenses
 
     test "cria um gasto conforme os parâmetros informados", context do
       %{account: account, category: category, user: user} = context
@@ -565,7 +565,7 @@ defmodule MyExpenses.ExpensesTest do
     %{user: user, account: account}
   end
 
-  defp setup_categoty_expenses(_) do
+  defp setup_category_expenses(_) do
     %{category: create_expense_category()}
   end
 
