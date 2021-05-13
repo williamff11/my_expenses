@@ -34,7 +34,7 @@ defmodule MyExpenses.GainsTest do
       category_id = category.id
 
       assert %{
-               id: category_id,
+               id: ^category_id,
                name: _,
                description: _,
                icon: _,
@@ -42,7 +42,7 @@ defmodule MyExpenses.GainsTest do
              } = Gains.show_gain_category(category_id)
     end
 
-    test "retorna nil caso o id informado não exista", context do
+    test "retorna nil caso o id informado não exista" do
       refute Gains.show_gain_category(0)
     end
   end
@@ -85,7 +85,7 @@ defmodule MyExpenses.GainsTest do
 
       assert {:error, errors} = Gains.create_gain_category(params)
 
-      assert errors = [name: {"has already been taken", []}]
+      assert errors_on(errors) == %{name: ["has already been taken"]}
     end
   end
 
@@ -103,7 +103,7 @@ defmodule MyExpenses.GainsTest do
 
       assert {:ok,
               %{
-                id: category_id,
+                id: ^category_id,
                 name: "Freelancer"
               }} = Gains.update_gain_category(category, update_params)
     end
@@ -177,7 +177,7 @@ defmodule MyExpenses.GainsTest do
     setup :setup_gains
 
     test "retorna o ganho conforme parametros informados", context do
-      %{user: user, account: account, gain: gain} = context
+      %{user: user, gain: gain} = context
 
       user_id = user.id
       gain_id = gain.id
@@ -196,8 +196,7 @@ defmodule MyExpenses.GainsTest do
   describe "create_gain/1" do
     setup :prepares_for_insert_gain
 
-    test "cria e retorna o ganho conforme parametros informados",
-     do
+    test "cria e retorna o ganho conforme parametros informados", context do
       %{category: category, user: user, account: account} = context
 
       account_id = account.id
@@ -220,7 +219,7 @@ defmodule MyExpenses.GainsTest do
 
       assert {:ok,
               %{
-                amount: amount,
+                amount: ^amount,
                 fix: false,
                 account_id: ^account_id,
                 user_id: ^user_id,
@@ -229,7 +228,6 @@ defmodule MyExpenses.GainsTest do
     end
 
     test "erro ao passar os parametros errados" do
-
     end
   end
 
