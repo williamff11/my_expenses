@@ -20,7 +20,7 @@ defmodule MyExpenses.ExpensesTest do
 
       assert [
                %Schema.ExpenseCategory{
-                 id: category_id,
+                 id: ^category_id,
                  name: _,
                  description: _,
                  icon: _,
@@ -43,7 +43,7 @@ defmodule MyExpenses.ExpensesTest do
       category_id = category.id
 
       assert %Schema.ExpenseCategory{
-               id: category_id,
+               id: ^category_id,
                name: _,
                description: _,
                icon: _,
@@ -63,7 +63,9 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {:error, errors} = Expenses.create_expense_category(params)
 
-      assert errors = [name: {"can't be blank", [validation: :required]}]
+      assert errors_on(errors) == %{
+               name: ["can't be blank"]
+             }
     end
 
     test "cria categoria conforme parametros passados" do
@@ -99,7 +101,7 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {:ok,
               %Schema.ExpenseCategory{
-                id: category_id,
+                id: ^category_id,
                 name: _,
                 description: "description",
                 icon: _,
@@ -110,17 +112,13 @@ defmodule MyExpenses.ExpensesTest do
     test "erro ao tentar editar categoria com os parâmetros inválidos", context do
       %{category: category} = context
 
-      category_id = category.id
-
       params_update = %{color: "#6bc5d2", name: "ar"}
 
       assert {:error, errors} = Expenses.update_expense_category(category, params_update)
 
-      assert errors = [
-               name:
-                 {"should be at least %{count} character(s)",
-                  [count: 3, validation: :length, kind: :min, type: :string]}
-             ]
+      assert errors_on(errors) == %{
+               name: ["should be at least 3 character(s)"]
+             }
     end
   end
 
@@ -134,7 +132,7 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {
                :ok,
-               %Schema.ExpenseCategory{id: expense_id}
+               %Schema.ExpenseCategory{id: ^category_id}
              } = Expenses.delete_expense_category(category_id)
 
       refute Expenses.show_expense_category(category_id)
@@ -145,7 +143,7 @@ defmodule MyExpenses.ExpensesTest do
     setup :setup_expenses
 
     test "lista todas os gastos cadastradas por certo usuário", context do
-      %{user: user, account: account, expense: expense} = context
+      %{user: user, account: account} = context
 
       user_id = user.id
       account_id = account.id
@@ -161,17 +159,15 @@ defmodule MyExpenses.ExpensesTest do
                  payed: _,
                  fix: _,
                  frequency: _,
-                 account_id: account_id,
-                 user_id: user_id,
+                 account_id: ^account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                }
              ] = Expenses.list_expenses_by(%{user_id: user_id, account_id: account_id})
     end
 
     test "lista os gastos conformes parâmetros informados", context do
-      %{user: user} = context
-
-      expense = create_expense(user)
+      %{user: user, expense: expense} = context
 
       expense_category_id = expense.expense_category.id
 
@@ -189,8 +185,8 @@ defmodule MyExpenses.ExpensesTest do
                  fix: _,
                  frequency: _,
                  account_id: _,
-                 user_id: user_id,
-                 expense_category: %{id: expense_category_id}
+                 user_id: ^user_id,
+                 expense_category: %{id: ^expense_category_id}
                }
                | _
              ] =
@@ -201,12 +197,12 @@ defmodule MyExpenses.ExpensesTest do
     end
 
     test "lista nenhum gasto caso o user_id de consulta seja diferente do gasto", context do
-      %{user: user, expense: expense} = context
+      %{user: user} = context
 
       user_id = user.id
 
       assert [
-               %MyExpenses.Expenses.Schema.Expense{user_id: user_id}
+               %MyExpenses.Expenses.Schema.Expense{user_id: ^user_id}
              ] = Expenses.list_expenses_by(%{user_id: user_id})
 
       another_user = create_user()
@@ -261,15 +257,15 @@ defmodule MyExpenses.ExpensesTest do
                %Schema.Expense{
                  fix: true,
                  frequency: _,
-                 account_id: account_id,
-                 user_id: user_id,
+                 account_id: ^account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                },
                %Schema.Expense{
                  fix: true,
                  frequency: _,
-                 account_id: another_account_id,
-                 user_id: user_id,
+                 account_id: ^another_account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                }
                | _
@@ -293,8 +289,8 @@ defmodule MyExpenses.ExpensesTest do
                %Schema.Expense{
                  fix: true,
                  frequency: :mensalmente,
-                 account_id: account_id,
-                 user_id: user_id,
+                 account_id: ^account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                }
              ] =
@@ -308,8 +304,8 @@ defmodule MyExpenses.ExpensesTest do
                %Schema.Expense{
                  fix: true,
                  frequency: :semanalmente,
-                 account_id: another_account_id,
-                 user_id: user_id,
+                 account_id: ^another_account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                }
              ] =
@@ -332,8 +328,8 @@ defmodule MyExpenses.ExpensesTest do
                %Schema.Expense{
                  fix: true,
                  frequency: :mensalmente,
-                 account_id: account_id,
-                 user_id: user_id,
+                 account_id: ^account_id,
+                 user_id: ^user_id,
                  expense_category: %{}
                }
              ] =
@@ -366,8 +362,8 @@ defmodule MyExpenses.ExpensesTest do
                fix: _,
                frequency: _,
                account_id: _,
-               user_id: user_id,
-               expense_category: %{id: expense_category_id}
+               user_id: ^user_id,
+               expense_category: %{id: ^expense_category_id}
              } = Expenses.show_expense(expense.id)
     end
 
@@ -399,14 +395,12 @@ defmodule MyExpenses.ExpensesTest do
         user_id: user_id
       }
 
-      expense_category_id = category.id
-
       assert {:ok,
               %Schema.Expense{
                 payed: true,
                 fix: false,
-                account_id: account_id,
-                user_id: user_id
+                account_id: ^account_id,
+                user_id: ^user_id
               }} = Expenses.create_expense(category, params)
     end
 
@@ -426,14 +420,12 @@ defmodule MyExpenses.ExpensesTest do
         user_id: user_id
       }
 
-      expense_category_id = category.id
-
       assert {:ok,
               %Schema.Expense{
                 payed: true,
                 fix: false,
-                account_id: account_id,
-                user_id: user_id
+                account_id: ^account_id,
+                user_id: ^user_id
               }} = Expenses.create_expense(category, params)
     end
 
@@ -447,8 +439,6 @@ defmodule MyExpenses.ExpensesTest do
         fix: nil,
         user_id: 0
       }
-
-      expense_category_id = category.id
 
       assert {:error, %Ecto.Changeset{errors: errors}} = Expenses.create_expense(category, params)
 
@@ -480,10 +470,10 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {:ok,
               %Schema.Expense{
-                id: expense_id,
+                id: ^expense_id,
                 date_spend: ~D[2019-09-20],
                 tag: "shoes",
-                user_id: user_id
+                user_id: ^user_id
               }} = Expenses.update_expense(expense, params)
     end
 
@@ -500,14 +490,14 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {:ok,
               %Schema.Expense{
-                id: expense_id,
-                account_id: another_account_id,
-                user_id: user_id
+                id: ^expense_id,
+                account_id: ^another_account_id,
+                user_id: ^user_id
               }} = Expenses.update_expense(expense, params)
     end
 
     test "erro ao tentar raelizar update com os parâmtros inválidos", context do
-      %{expense: expense, user: user} = context
+      %{expense: expense} = context
 
       params = %{
         amount: 0,
@@ -533,7 +523,7 @@ defmodule MyExpenses.ExpensesTest do
     setup :create_many_expenses
 
     test "lista somente as categoria de gastos do usuário", context do
-      %{user: user, account: account} = context
+      %{user: user} = context
 
       expenses_categories = Expenses.list_expense_category_by_user(user)
 
@@ -548,10 +538,10 @@ defmodule MyExpenses.ExpensesTest do
     setup :setup_expenses
 
     test "deleta de forma lógica o gasto", context do
-      %{expense: expense, user: user} = context
+      %{expense: expense} = context
 
       expense_id = expense.id
-      assert {:ok, %Schema.Expense{id: expense_id}} = Expenses.delete_expense(expense)
+      assert {:ok, %Schema.Expense{id: ^expense_id}} = Expenses.delete_expense(expense)
 
       refute Expenses.show_expense(expense_id)
     end
@@ -596,7 +586,7 @@ defmodule MyExpenses.ExpensesTest do
 
     expense_category = expense.expense_category
 
-    Enum.each(1..7, fn x ->
+    Enum.each(1..7, fn _x ->
       if Enum.random([false, true]) do
         create_expense(user, %{account_id: account_of_expense.id}, expense_category)
       else
