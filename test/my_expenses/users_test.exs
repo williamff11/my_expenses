@@ -132,11 +132,11 @@ defmodule MyExpenses.UserTest do
 
       assert {:error, errors} = User.create_user(params)
 
-      assert errors = [
-               birth_date: {"can't be blank", [validation: :required]},
-               cpf: {"can't be blank", [validation: :required]},
-               login: {"can't be blank", [validation: :required]}
-             ]
+      assert errors_on(errors) == %{
+               birth_date: ["can't be blank"],
+               cpf: ["can't be blank"],
+               login: ["can't be blank"]
+             }
     end
 
     test "cria usuário conforme parâmetros passados" do

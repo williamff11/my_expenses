@@ -12,7 +12,7 @@ defmodule MyExpenses.AccountsTest do
   describe "list_institutions/0" do
     setup :setup_institution
 
-    test "lista todas as instituicoes cadatradas", context do
+    test "lista todas as instituicoes cadatradas" do
       assert [%Schema.Institution{}] = Accounts.list_institutions()
     end
   end
@@ -27,7 +27,7 @@ defmodule MyExpenses.AccountsTest do
     end
 
     test "lista todas as contas do usuário", context do
-      %{user: user, account: account} = context
+      %{user: user} = context
 
       create_account(user)
 
@@ -61,13 +61,13 @@ defmodule MyExpenses.AccountsTest do
 
       assert [
                %Schema.Account{
-                 name: name,
-                 num_account: num_account,
-                 type_account: type_account,
-                 institution_id: institution_id,
+                 name: ^name,
+                 num_account: ^num_account,
+                 type_account: ^type_account,
+                 institution_id: ^institution_id,
                  description: _,
                  initial_amount_value: _,
-                 user_id: user_id
+                 user_id: ^user_id
                }
              ] =
                Accounts.list_accounts_by(%{
@@ -106,15 +106,15 @@ defmodule MyExpenses.AccountsTest do
       user_id = user.id
 
       assert %Schema.Account{
-               id: account_id,
+               id: ^account_id,
                name: _,
                num_account: _,
                type_account: _,
                institution_id: _,
                description: _,
                initial_amount_value: _,
-               user_id: user_id
-             } = Accounts.show_account(user.id, account.id)
+               user_id: ^user_id
+             } = Accounts.show_account(user_id, account.id)
     end
   end
 
@@ -169,9 +169,9 @@ defmodule MyExpenses.AccountsTest do
                 name: "Account Test",
                 num_account: "0076416-7",
                 type_account: :corrente,
-                institution_id: institution_id,
+                institution_id: ^institution_id,
                 description: "Sucess",
-                initial_amount_value: amount_value
+                initial_amount_value: ^amount_value
               }} = account
     end
   end
@@ -250,8 +250,8 @@ defmodule MyExpenses.AccountsTest do
 
       assert {:ok,
               %Schema.Account{
-                id: account_id,
-                user_id: user_id
+                id: ^account_id,
+                user_id: ^user_id
               }} = Accounts.delete_account(user_id, account_id)
     end
   end
