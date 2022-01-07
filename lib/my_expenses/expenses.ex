@@ -20,8 +20,8 @@ defmodule MyExpenses.Expenses do
           tag: String.t(),
           note: String.t(),
           date_spend: Date.t(),
-          payed: boolean(),
-          fix: boolean(),
+          payed?: boolean(),
+          fix?: boolean(),
           account_id: UUID.t(),
           user_id: UUID.t()
         }

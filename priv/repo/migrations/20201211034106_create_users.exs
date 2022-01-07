@@ -3,16 +3,16 @@ defmodule MyExpenses.Repo.Migrations.CreateUsers do
 
   def change do
     create table(:users, primary_key: false) do
-      add(:id, :uuid, primary_key: true, null: false)
-      add(:name, :string, size: 80, null: false)
-      add(:email, :string, size: 180, null: false)
-      add(:phone, :string, size: 15, null: false)
-      add(:birth_date, :date, null: false)
-      add(:cpf, :string, unique: true, null: false)
-      add(:login, :string, size: 50, unique: true, null: false)
-      add(:password, :string, size: 200, null: false)
+      add :id, :uuid, primary_key: true, null: false
+      add :name, :string, size: 80, null: false
+      add :email, :string, size: 180, null: false
+      add :phone, :string, size: 15, null: false
+      add :birth_date, :date, null: false
+      add :cpf, :string, unique: true, null: false
+      add :login, :string, size: 50, unique: true, null: false
+      add :password, :string, size: 200, null: false
 
-      add(:deleted_at, :utc_datetime)
+      add :deleted_at, :utc_datetime
 
       timestamps(
         inserted_at: :created_at,
