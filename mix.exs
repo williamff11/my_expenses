@@ -48,6 +48,7 @@ defmodule MyExpenses.MixProject do
   defp deps do
     [
       {:ecto_sql, "~> 3.4"},
+      {:ex_machina, "~> 2.7.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
       {:phoenix, "~> 1.5.3"},

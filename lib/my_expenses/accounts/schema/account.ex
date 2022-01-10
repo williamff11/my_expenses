@@ -7,8 +7,9 @@ defmodule MyExpenses.Accounts.Schema.Account do
 
   import Ecto.Changeset
 
-  alias MyExpenses.Accounts.Schema
+  alias MyExpenses.Accounts.Schema.Institution
   alias MyExpenses.Accounts.Types
+  alias MyExpenses.Users.Schema.User
 
   @type t() :: %__MODULE__{
           name: String.t(),
@@ -16,13 +17,14 @@ defmodule MyExpenses.Accounts.Schema.Account do
           num_account: String.t(),
           initial_amount_value: Decimal.t(),
           type_account: :corrente | :poupanca | :salario | :investimento,
-          user_id: binary(),
-          institution: Schema.Institution,
+          user_id: User,
+          institution: Institution,
           created_at: DateTime.t(),
           updated_at: DateTime.t()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
@@ -33,8 +35,8 @@ defmodule MyExpenses.Accounts.Schema.Account do
     field :initial_amount_value, :decimal
     field :type_account, Types.TypeAccount
 
-    field :user_id, :binary_id
-    belongs_to :institution, Schema.Institution
+    belongs_to :institution, Institution
+    belongs_to :user, User
 
     timestamps(
       inserted_at: :created_at,
@@ -59,8 +61,8 @@ defmodule MyExpenses.Accounts.Schema.Account do
 
     struct
     |> cast(params, fields_required ++ options_fields)
-    |> foreign_key_constraint(:intituition_id)
-    |> foreign_key_constraint(:user_id)
+    |> foreign_key_constraint(:intituition)
+    |> foreign_key_constraint(:user)
     |> validate_required(fields_required)
     |> validate_changeset()
   end
