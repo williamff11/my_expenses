@@ -20,3 +20,5 @@ config :my_expenses, MyExpensesWeb.Endpoint,
 
 # Print only warnings and errors during test
 config :logger, level: :warn
+
+config :my_expenses, MyExpensesWeb.Auth, secret_key: "SECRET"

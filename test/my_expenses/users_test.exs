@@ -66,7 +66,7 @@ defmodule MyExpenses.UserTest do
     end
   end
 
-  describe "show_user" do
+  describe "get_user" do
     setup :setup_user
 
     test "show usuario", context do
@@ -80,7 +80,7 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user(user_id)
+             } = User.get_user(user_id)
     end
 
     test "só mostra o usuário caso ele não esteja deletado", context do
@@ -96,10 +96,10 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user(user_id)
+             } = User.get_user(user_id)
 
       User.delete_user(user)
-      refute User.show_user(user_id)
+      refute User.get_user(user_id)
     end
 
     test "show usuario deletado", context do
@@ -117,7 +117,7 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user_deleted(user_id)
+             } = User.get_user_deleted(user_id)
     end
   end
 

@@ -11,6 +11,8 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
+jwt_secret = System.get_env("JWT_SECRET") || raise "'JWT_SECRET' is not defined."
+
 config :my_expenses, MyExpenses.Repo,
   # ssl: true,
   url: database_url,
@@ -41,6 +43,8 @@ config :my_expenses, MyExpensesWeb.Endpoint,
     transport_options: [socket_opts: [:inet6]]
   ],
   secret_key_base: secret_key_base
+
+config :my_expenses, MyExpensesWeb.Auth, secret_key: jwt_secret
 
 # ## Using releases (Elixir v1.9+)
 #
