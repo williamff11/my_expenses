@@ -1,12 +1,18 @@
-FROM jorgefrueda/elixir:1.11-ubuntu-20.04
+FROM elixir:1.11
 
-USER root
+RUN apt-get update
 
-RUN apt-get update && \
-    apt-get install -y postgresql-client && \
-    apt-get install -y inotify-tools && \
-    mix local.hex --force && \
-    mix archive.install hex phx_new 1.5.3 --force && \
-    mix local.rebar --force
+RUN apt-get install -y inotify-tools
 
-USER elixir
+RUN apt-get install -y postgresql-client
+
+RUN mkdir ./app
+COPY . /app
+WORKDIR /app
+
+RUN mix local.hex --force
+RUN mix local.rebar --force
+
+RUN mix deps.get
+
+CMD /app/entrypoint.sh

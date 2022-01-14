@@ -20,6 +20,11 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
           updated_at: DateTime.t()
         }
 
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+
   schema "expenses_category" do
     field(:name, :string)
     field(:description, :string)

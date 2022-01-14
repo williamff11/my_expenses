@@ -21,20 +21,20 @@ defmodule MyExpenses.Users.Schema.User do
           updated_at: DateTime.t()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
 
   @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
   schema "users" do
-    field(:name, :string)
-    field(:email, :string)
-    field(:phone, :string)
-    field(:birth_date, :date)
-    field(:cpf, :string)
-    field(:login, :string)
-    field(:password, :string)
+    field :name, :string
+    field :email, :string
+    field :phone, :string
+    field :birth_date, :date
+    field :cpf, :string
+    field :login, :string
+    field :password, :string
 
-    field(:deleted_at, :utc_datetime)
+    field :deleted_at, :utc_datetime
 
     timestamps(
       inserted_at: :created_at,

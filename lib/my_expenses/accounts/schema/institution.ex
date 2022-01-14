@@ -11,6 +11,7 @@ defmodule MyExpenses.Accounts.Schema.Institution do
           legal_name: String.t()
         }
 
+  @primary_key {:id, :binary_id, autogenerate: true}
   schema "institutions" do
     field :logo, :string
     field :name, :string

@@ -3,8 +3,7 @@ defmodule MyExpenses.AccountsTest do
 
   use MyExpenses.Support.DataCase, async: true
 
-  import MyExpenses.Support.Accounts
-  import MyExpenses.Support.Users
+  import MyExpenses.Factories
 
   alias MyExpenses.Accounts
   alias MyExpenses.Accounts.Schema
@@ -29,7 +28,7 @@ defmodule MyExpenses.AccountsTest do
     test "lista todas as contas do usuário", context do
       %{user: user} = context
 
-      create_account(user)
+      insert(:account, user: user)
 
       user_id = user.id
 
@@ -85,7 +84,7 @@ defmodule MyExpenses.AccountsTest do
 
     test "retorna nil caso o usuario informado não seja o dono da conta", context do
       %{account: account} = context
-      user = create_user()
+      user = insert(:user)
 
       refute Accounts.show_account(user.id, account.id)
     end
@@ -93,8 +92,8 @@ defmodule MyExpenses.AccountsTest do
     test "retorna nil caso a conta informada não seja do dono da conta", context do
       %{user: user} = context
 
-      outher_user = create_user()
-      account = create_account(outher_user)
+      outher_user = insert(:user)
+      account = insert(:account, user: outher_user)
 
       refute Accounts.show_account(user.id, account.id)
     end
@@ -124,7 +123,7 @@ defmodule MyExpenses.AccountsTest do
     test "erro ao tentar cadastrar uma conta com os dados inválidos", context do
       %{user: user} = context
 
-      institution = create_institution()
+      institution = insert(:institution)
 
       params = %{
         name: "AB",
@@ -147,7 +146,7 @@ defmodule MyExpenses.AccountsTest do
     test "cria conta conforme os parâmetros informados", context do
       %{user: user} = context
 
-      institution = create_institution()
+      institution = insert(:institution)
 
       institution_id = institution.id
 
@@ -182,7 +181,7 @@ defmodule MyExpenses.AccountsTest do
     test "erro ao passar uma conta que não pertence ao usuário informado", context do
       %{account: account} = context
 
-      user = create_user()
+      user = insert(:user)
 
       params = %{name: "change_name"}
 
@@ -235,7 +234,7 @@ defmodule MyExpenses.AccountsTest do
     test "erro ao passar uma conta que não pertence ao usuário informado", context do
       %{account: account} = context
 
-      user = create_user()
+      user = insert(:user)
 
       assert_raise RuntimeError, "account not found", fn ->
         Accounts.delete_account(user.id, account.id)
@@ -257,14 +256,14 @@ defmodule MyExpenses.AccountsTest do
   end
 
   defp setup_account(_) do
-    user = create_user()
+    user = insert(:user)
 
-    account = create_account(user)
+    account = insert(:account, user: user)
 
     %{user: user, account: account}
   end
 
   defp setup_institution(_) do
-    %{institution: create_institution()}
+    %{institution: insert(:institution)}
   end
 end

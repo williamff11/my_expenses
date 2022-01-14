@@ -27,7 +27,7 @@ defmodule MyExpenses.Expenses.Query.ExpensesQuery do
 
   def get_expenses_fixed_by(params \\ %{}) do
     if params == %{} do
-      from expense in Schema.Expense, where: expense.fix == true
+      from expense in Schema.Expense, where: expense.fix? == true
     else
       conditions = build_filter(params)
 
@@ -52,8 +52,8 @@ defmodule MyExpenses.Expenses.Query.ExpensesQuery do
       {:expenses_category_id, value}, dynamic ->
         dynamic([expense], ^dynamic and expense.expenses_category_id == ^value)
 
-      {:fix, value}, dynamic ->
-        dynamic([expense], ^dynamic and expense.fix == ^value)
+      {:fix?, value}, dynamic ->
+        dynamic([expense], ^dynamic and expense.fix? == ^value)
 
       {:deleted_at, false}, dynamic ->
         dynamic([expense], ^dynamic and is_nil(expense.deleted_at))

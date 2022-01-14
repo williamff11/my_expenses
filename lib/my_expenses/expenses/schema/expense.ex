@@ -8,8 +8,10 @@ defmodule MyExpenses.Expenses.Schema.Expense do
 
   import Ecto.Changeset
 
+  alias MyExpenses.Accounts.Schema.Account
   alias MyExpenses.Ecto.Types
   alias MyExpenses.Expenses.Schema
+  alias MyExpenses.Users.Schema.User
 
   @type t() :: %__MODULE__{
           description: String.t(),
@@ -18,8 +20,8 @@ defmodule MyExpenses.Expenses.Schema.Expense do
           tag: String.t(),
           note: DateTime.t(),
           date_spend: Date.t(),
-          payed: boolean(),
-          fix: boolean(),
+          payed?: boolean(),
+          fix?: boolean(),
           frequency: :semanalmente | :quinzenalmente | :mensalmente | :anualmente,
           account_id: binary(),
           user_id: binary(),
@@ -29,7 +31,8 @@ defmodule MyExpenses.Expenses.Schema.Expense do
           updated_at: DateTime.t()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
@@ -38,14 +41,15 @@ defmodule MyExpenses.Expenses.Schema.Expense do
     field :amount, :decimal
     field :attachment, :string
     field :date_spend, :date
-    field :payed, :boolean
-    field :fix, :boolean
+    field :payed?, :boolean
+    field :payment_method, Types.Atom
+    field :fix?, :boolean
     field :frequency, Types.Atom
     field :tag, :string
     field :note, :string
-    field :account_id, :binary_id
-    field :user_id, :binary_id
 
+    belongs_to :account, Account
+    belongs_to :user, User
     belongs_to :expense_category, Schema.ExpenseCategory
 
     field :deleted_at, :utc_datetime
@@ -62,64 +66,49 @@ defmodule MyExpenses.Expenses.Schema.Expense do
     Map.fetch(struct, key)
   end
 
+  @fields ~w(
+    description
+    amount
+    date_spend
+    payed?
+    payment_method
+    fix?
+    account_id
+    user_id
+    expense_category_id
+    tag
+    attachment
+    note
+    frequency
+  )a
+
+  @fields_required ~w(
+    description
+    amount
+    date_spend
+    payed?
+    payment_method
+    fix?
+    account_id
+    user_id
+    expense_category_id
+  )a
+
   def create_changeset(%__MODULE__{} = struct, params) do
-    options_fields = [
-      :tag,
-      :attachment,
-      :note,
-      :frequency
-    ]
-
-    fields_required = [
-      :description,
-      :amount,
-      :date_spend,
-      :payed,
-      :fix,
-      :account_id,
-      :user_id,
-      :expense_category_id
-    ]
-
     struct
-    |> cast(params, fields_required ++ options_fields)
+    |> cast(params, @fields)
     |> validate_changeset()
   end
 
   def update_changeset(%__MODULE__{} = struct, params) do
-    fields = [
-      :description,
-      :amount,
-      :date_spend,
-      :payed,
-      :fix,
-      :account_id,
-      :tag,
-      :attachment,
-      :note,
-      :frequency,
-      :expense_category_id
-    ]
-
     struct
-    |> cast(params, fields)
+    |> cast(params, @fields)
     |> validate_changeset()
   end
 
   defp validate_changeset(changeset) do
-    fields_required = [
-      :description,
-      :amount,
-      :date_spend,
-      :payed,
-      :fix,
-      :account_id,
-      :user_id,
-      :expense_category_id
-    ]
-
     changeset
-    |> validate_required(fields_required)
+    |> validate_required(@fields_required)
     |> validate_length(:description, max: 255)
     |> validate_number(:amount, greater_than: 0)
     |> foreign_key_constraint(:expense_category_id)

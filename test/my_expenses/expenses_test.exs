@@ -3,9 +3,7 @@ defmodule MyExpenses.ExpensesTest do
 
   use MyExpenses.Support.DataCase, async: true
 
-  import MyExpenses.Support.Accounts
-  import MyExpenses.Support.Expenses
-  import MyExpenses.Support.Users
+  import MyExpenses.Factories
 
   alias MyExpenses.Expenses
   alias MyExpenses.Expenses.Schema
@@ -34,7 +32,7 @@ defmodule MyExpenses.ExpensesTest do
     setup :setup_category_expenses
 
     test "retorna nil ao passar uma categoria que não existe" do
-      refute Expenses.show_expense_category(0)
+      refute Expenses.show_expense_category(Faker.UUID.v4())
     end
 
     test "mostra determinada categoria de gastos, filtrando por id", context do
@@ -63,9 +61,7 @@ defmodule MyExpenses.ExpensesTest do
 
       assert {:error, errors} = Expenses.create_expense_category(params)
 
-      assert errors_on(errors) == %{
-               name: ["can't be blank"]
-             }
+      assert errors_on(errors) == %{name: ["can't be blank"]}
     end
 
     test "cria categoria conforme parametros passados" do
@@ -156,8 +152,8 @@ defmodule MyExpenses.ExpensesTest do
                  tag: _,
                  note: _,
                  date_spend: _,
-                 payed: _,
-                 fix: _,
+                 payed?: _,
+                 fix?: _,
                  frequency: _,
                  account_id: ^account_id,
                  user_id: ^user_id,
@@ -181,8 +177,8 @@ defmodule MyExpenses.ExpensesTest do
                  tag: _,
                  note: _,
                  date_spend: _,
-                 payed: _,
-                 fix: _,
+                 payed?: _,
+                 fix?: _,
                  frequency: _,
                  account_id: _,
                  user_id: ^user_id,
@@ -205,7 +201,7 @@ defmodule MyExpenses.ExpensesTest do
                %MyExpenses.Expenses.Schema.Expense{user_id: ^user_id}
              ] = Expenses.list_expenses_by(%{user_id: user_id})
 
-      another_user = create_user()
+      another_user = insert(:user)
 
       another_user_id = another_user.id
 
@@ -228,11 +224,11 @@ defmodule MyExpenses.ExpensesTest do
     test "lista todos os gastos cadastrados que são fixos", context do
       %{user: user} = context
 
-      create_expense(user, %{fix: true, frequency: :mensalmente})
+      insert(:expense, user: user, fix?: true, frequency: :mensalmente)
 
       assert [
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: :mensalmente,
                  expense_category: %{}
                }
@@ -246,23 +242,23 @@ defmodule MyExpenses.ExpensesTest do
       user_id = user.id
       account_id = account.id
 
-      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+      insert(:expense, user: user, fix?: true, account: account, frequency: :mensalmente)
 
-      another_account = create_account(user)
+      another_account = insert(:account, user: user)
       another_account_id = another_account.id
 
-      create_expense(user, %{fix: true, account_id: another_account_id, frequency: :semanalmente})
+      insert(:expense, user: user, fix?: true, account: another_account, frequency: :semanalmente)
 
       assert [
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: _,
                  account_id: ^account_id,
                  user_id: ^user_id,
                  expense_category: %{}
                },
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: _,
                  account_id: ^another_account_id,
                  user_id: ^user_id,
@@ -278,16 +274,16 @@ defmodule MyExpenses.ExpensesTest do
       user_id = user.id
       account_id = account.id
 
-      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+      insert(:expense, user: user, fix?: true, account: account, frequency: :mensalmente)
 
-      another_account = create_account(user)
+      another_account = insert(:account, user: user)
       another_account_id = another_account.id
 
-      create_expense(user, %{fix: true, account_id: another_account_id, frequency: :semanalmente})
+      insert(:expense, user: user, fix?: true, account: another_account, frequency: :semanalmente)
 
       assert [
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: :mensalmente,
                  account_id: ^account_id,
                  user_id: ^user_id,
@@ -297,12 +293,12 @@ defmodule MyExpenses.ExpensesTest do
                Expenses.list_expenses_fixed_by(%{
                  user_id: user_id,
                  account_id: account_id,
-                 fix: true
+                 fix?: true
                })
 
       assert [
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: :semanalmente,
                  account_id: ^another_account_id,
                  user_id: ^user_id,
@@ -312,7 +308,7 @@ defmodule MyExpenses.ExpensesTest do
                Expenses.list_expenses_fixed_by(%{
                  user_id: user_id,
                  account_id: another_account_id,
-                 fix: true
+                 fix?: true
                })
     end
 
@@ -322,11 +318,11 @@ defmodule MyExpenses.ExpensesTest do
       user_id = user.id
       account_id = account.id
 
-      create_expense(user, %{fix: true, account_id: account_id, frequency: :mensalmente})
+      insert(:expense, user: user, fix?: true, account: account, frequency: :mensalmente)
 
       assert [
                %Schema.Expense{
-                 fix: true,
+                 fix?: true,
                  frequency: :mensalmente,
                  account_id: ^account_id,
                  user_id: ^user_id,
@@ -336,7 +332,7 @@ defmodule MyExpenses.ExpensesTest do
                Expenses.list_expenses_fixed_by(%{
                  user_id: user_id,
                  frequency: :mensalmente,
-                 fix: true
+                 fix?: true
                })
     end
   end
@@ -358,8 +354,8 @@ defmodule MyExpenses.ExpensesTest do
                tag: _,
                note: _,
                date_spend: _,
-               payed: _,
-               fix: _,
+               payed?: _,
+               fix?: _,
                frequency: _,
                account_id: _,
                user_id: ^user_id,
@@ -382,23 +378,12 @@ defmodule MyExpenses.ExpensesTest do
       account_id = account.id
       user_id = user.id
 
-      params = %{
-        description: "description_test",
-        amount: 8.88,
-        attachment: "random.jpg",
-        tag: "work",
-        note: "note_test",
-        date_spend: ~D[2021-01-26],
-        payed: true,
-        fix: false,
-        account_id: account_id,
-        user_id: user_id
-      }
+      params = params_for(:expense, account: account, user: user)
 
       assert {:ok,
               %Schema.Expense{
-                payed: true,
-                fix: false,
+                payed?: true,
+                fix?: false,
                 account_id: ^account_id,
                 user_id: ^user_id
               }} = Expenses.create_expense(category, params)
@@ -410,20 +395,12 @@ defmodule MyExpenses.ExpensesTest do
       account_id = account.id
       user_id = user.id
 
-      params = %{
-        description: "a",
-        amount: 1,
-        date_spend: ~D[2021-01-26],
-        payed: true,
-        fix: false,
-        account_id: account_id,
-        user_id: user_id
-      }
+      params = params_for(:expense, account: account, user: user)
 
       assert {:ok,
               %Schema.Expense{
-                payed: true,
-                fix: false,
+                payed?: true,
+                fix?: false,
                 account_id: ^account_id,
                 user_id: ^user_id
               }} = Expenses.create_expense(category, params)
@@ -435,8 +412,8 @@ defmodule MyExpenses.ExpensesTest do
       params = %{
         amount: 0,
         date_spend: ~D[2021-01-26],
-        payed: nil,
-        fix: nil,
+        payed?: nil,
+        fix?: nil,
         user_id: 0
       }
 
@@ -446,8 +423,9 @@ defmodule MyExpenses.ExpensesTest do
                [
                  amount: {"must be greater than %{number}", _},
                  description: {"can't be blank", [validation: :required]},
-                 payed: {"can't be blank", [validation: :required]},
-                 fix: {"can't be blank", [validation: :required]},
+                 payed?: {"can't be blank", [validation: :required]},
+                 payment_method: {"can't be blank", [validation: :required]},
+                 fix?: {"can't be blank", [validation: :required]},
                  account_id: {"can't be blank", [validation: :required]},
                  user_id: {"is invalid", [type: :binary_id, validation: :cast]}
                ] = errors
@@ -480,7 +458,7 @@ defmodule MyExpenses.ExpensesTest do
     test "realiza um update trocando a conta do gasto", context do
       %{expense: expense, user: user} = context
 
-      another_account_id = create_account(user).id
+      another_account_id = insert(:account, user: user).id
       expense_id = expense.id
       user_id = user.id
 
@@ -502,8 +480,8 @@ defmodule MyExpenses.ExpensesTest do
       params = %{
         amount: 0,
         date_spend: ~D[2021-01-26],
-        payed: nil,
-        fix: nil,
+        payed?: nil,
+        fix?: nil,
         account_id: 0
       }
 
@@ -512,8 +490,8 @@ defmodule MyExpenses.ExpensesTest do
       assert errors:
                [
                  amount: {"must be greater than %{number}", _},
-                 payed: {"can't be blank", [validation: :required]},
-                 fix: {"can't be blank", [validation: :required]},
+                 payed?: {"can't be blank", [validation: :required]},
+                 fix?: {"can't be blank", [validation: :required]},
                  account_id: {"is invalid", [type: :binary_id, validation: :cast]}
                ] = errors
     end
@@ -548,31 +526,30 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   def setup_account(_) do
-    user = create_user()
+    user = insert(:user)
 
-    account = create_account(user)
+    account = insert(:account, user: user)
 
     %{user: user, account: account}
   end
 
-  defp setup_category_expenses(_) do
-    %{category: create_expense_category()}
+  defp setup_categoty_expenses(_) do
+    %{category: insert(:expense_category)}
   end
 
   defp setup_expenses(_) do
-    user = create_user()
+    user = insert(:user)
 
-    account = create_account(user)
-
-    expense = create_expense(user, %{account_id: account.id})
+    account = insert(:account, user: user)
+    expense = insert(:expense, user: user, account: account)
 
     %{user: user, account: account, expense: expense}
   end
 
   defp setup_expenses_fixed(_) do
-    user = create_user()
+    user = insert(:user)
 
-    account = create_account(user)
+    account = insert(:account, user: user)
 
     %{user: user, account: account}
   end
@@ -580,19 +557,13 @@ defmodule MyExpenses.ExpensesTest do
   defp create_many_expenses(_) do
     %{user: user, account: account, expense: expense} = setup_expenses([])
 
-    another_account = create_account(user)
+    another_account = insert(:account, user: user)
 
     account_of_expense = Enum.random([account, another_account])
 
     expense_category = expense.expense_category
 
-    Enum.each(1..7, fn _x ->
-      if Enum.random([false, true]) do
-        create_expense(user, %{account_id: account_of_expense.id}, expense_category)
-      else
-        create_expense(user, %{account_id: account_of_expense.id})
-      end
-    end)
+    insert_list(7, :expense, user: user, account: account_of_expense, expense_category: expense_category)
 
     %{user: user, account: account, expense: expense}
   end

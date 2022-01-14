@@ -4,11 +4,12 @@ defmodule MyExpenses.Repo.Migrations.CreateCategoryExpenses do
   use Ecto.Migration
 
   def change do
-    create table(:expenses_category) do
-      add(:name, :string, size: 80, unique: true)
-      add(:description, :string, size: 255)
-      add(:icon, :string)
-      add(:color, :string)
+    create table(:expenses_category, primary_key: false) do
+      add :id, :uuid, primary_key: true, null: false
+      add :name, :string, size: 80
+      add :description, :string, size: 255
+      add :icon, :string
+      add :color, :string
 
       timestamps(
         inserted_at: :created_at,
@@ -16,8 +17,6 @@ defmodule MyExpenses.Repo.Migrations.CreateCategoryExpenses do
         type: :utc_datetime
       )
     end
-
-    create unique_index(:expenses_category, [:id], name: :IDX_EXPENSES_CATEGORY_ID)
   end
 
   def down do
