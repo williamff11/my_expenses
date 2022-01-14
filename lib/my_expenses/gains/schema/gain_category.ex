@@ -1,14 +1,12 @@
-defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
+defmodule MyExpenses.Gains.Schema.GainCategory do
   @moduledoc """
-  Módulo responsável por gerenciar as categoria de gastos do sistema
+  Módulo responsável por gerenciar as categoria de ganhos do sistema
   """
-  @behaviour Access
-
   use Ecto.Schema
 
   import Ecto.Changeset
 
-  alias MyExpenses.Expenses.Schema
+  alias MyExpenses.Gains.Schema
 
   @type t() :: %__MODULE__{
           id: non_neg_integer(),
@@ -23,26 +21,19 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+  schema "gains_category" do
+    field :name, :string
+    field :description, :string
+    field :icon, :string
+    field :color, :string
 
-  schema "expenses_category" do
-    field(:name, :string)
-    field(:description, :string)
-    field(:icon, :string)
-    field(:color, :string)
-
-    has_many(:expense, Schema.Expense)
+    has_many :gain, Schema.Gain
 
     timestamps(
       inserted_at: :created_at,
       updated_at: :updated_at,
       type: :utc_datetime
     )
-  end
-
-  @impl Access
-  def fetch(%__MODULE__{} = struct, key) do
-    Map.fetch(struct, key)
   end
 
   def changeset(%__MODULE__{} = struct, params) do

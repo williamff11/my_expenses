@@ -10,7 +10,7 @@ defmodule MyExpenses.Support.Users do
       email: Faker.Internet.email(),
       phone: Faker.Phone.EnGb.mobile_number() |> String.replace(" ", ""),
       birth_date: Faker.Date.date_of_birth(16..60),
-      cpf: Brcpfcnpj.cnpj_generate(),
+      cpf: Brcpfcnpj.cpf_generate(),
       login: Faker.Person.first_name() |> String.downcase(),
       password: "123456"
     }

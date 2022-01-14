@@ -33,5 +33,9 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
+# The directory of elixir_ls.
+/.elixir_ls/
+
+# The directory of my services.
 /services/minio/.data
 /services/postgres/.data
