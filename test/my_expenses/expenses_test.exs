@@ -9,10 +9,8 @@ defmodule MyExpenses.ExpensesTest do
   alias MyExpenses.Expenses.Schema
 
   describe "list_expense_categorys" do
-    setup :setup_category_expenses
-
-    test "listagem das categorias de gastos", context do
-      %{category: category} = context
+    test "listagem das categorias de gastos" do
+      category = insert(:expense_category)
 
       category_id = category.id
 
@@ -29,14 +27,12 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "show_expense_category" do
-    setup :setup_category_expenses
-
     test "retorna nil ao passar uma categoria que não existe" do
       refute Expenses.show_expense_category(Faker.UUID.v4())
     end
 
-    test "mostra determinada categoria de gastos, filtrando por id", context do
-      %{category: category} = context
+    test "mostra determinada categoria de gastos, filtrando por id" do
+      category = insert(:expense_category)
 
       category_id = category.id
 
@@ -86,10 +82,8 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "update_expense_category" do
-    setup :setup_category_expenses
-
-    test "edita a categoria conforme os dados passados", context do
-      %{category: category} = context
+    test "edita a categoria conforme os dados passados" do
+      category = insert(:expense_category)
 
       category_id = category.id
 
@@ -105,8 +99,8 @@ defmodule MyExpenses.ExpensesTest do
               }} = Expenses.update_expense_category(category, params_update)
     end
 
-    test "erro ao tentar editar categoria com os parâmetros inválidos", context do
-      %{category: category} = context
+    test "erro ao tentar editar categoria com os parâmetros inválidos" do
+      category = insert(:expense_category)
 
       params_update = %{color: "#6bc5d2", name: "ar"}
 
@@ -119,10 +113,8 @@ defmodule MyExpenses.ExpensesTest do
   end
 
   describe "delete_expense_category" do
-    setup :setup_category_expenses
-
-    test "deleta a categoria passada", context do
-      %{category: category} = context
+    test "deleta a categoria passada" do
+      category = insert(:expense_category)
 
       category_id = category.id
 
@@ -370,11 +362,11 @@ defmodule MyExpenses.ExpensesTest do
 
   describe "create_expense/2" do
     setup :setup_account
-    setup :setup_category_expenses
 
     test "cria um gasto conforme os parâmetros informados", context do
-      %{account: account, category: category, user: user} = context
+      %{account: account, user: user} = context
 
+      category = insert(:expense_category)
       account_id = account.id
       user_id = user.id
 
@@ -390,8 +382,9 @@ defmodule MyExpenses.ExpensesTest do
     end
 
     test "cria um gasto somente com os dados básicos", context do
-      %{account: account, category: category, user: user} = context
+      %{account: account, user: user} = context
 
+      category = insert(:expense_category)
       account_id = account.id
       user_id = user.id
 
@@ -406,8 +399,8 @@ defmodule MyExpenses.ExpensesTest do
               }} = Expenses.create_expense(category, params)
     end
 
-    test "retorna erro ao passar parametros errados na criação de um gasto", context do
-      %{category: category} = context
+    test "retorna erro ao passar parametros errados na criação de um gasto" do
+      category = insert(:expense_category)
 
       params = %{
         amount: 0,
@@ -531,10 +524,6 @@ defmodule MyExpenses.ExpensesTest do
     account = insert(:account, user: user)
 
     %{user: user, account: account}
-  end
-
-  defp setup_categoty_expenses(_) do
-    %{category: insert(:expense_category)}
   end
 
   defp setup_expenses(_) do

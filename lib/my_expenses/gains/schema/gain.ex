@@ -8,8 +8,10 @@ defmodule MyExpenses.Gains.Schema.Gain do
 
   import Ecto.Changeset
 
+  alias MyExpenses.Accounts.Schema.Account
   alias MyExpenses.Ecto.Types
   alias MyExpenses.Gains.Schema
+  alias MyExpenses.Users.Schema.User
 
   @type t() :: %__MODULE__{
           id: String.t(),
@@ -19,7 +21,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
           attachment: String.t(),
           tag: String.t(),
           note: String.t(),
-          fix: boolean(),
+          fix?: boolean(),
           frequency: String.t(),
           account_id: UUID.t(),
           user_id: UUID.t(),
@@ -29,7 +31,8 @@ defmodule MyExpenses.Gains.Schema.Gain do
           updated_at: DateTime.t()
         }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
@@ -38,13 +41,13 @@ defmodule MyExpenses.Gains.Schema.Gain do
     field :amount, :decimal
     field :attachment, :string
     field :date_receipt, :date
-    field :fix, :boolean
+    field :fix?, :boolean
     field :frequency, Types.Atom
     field :tag, :string
     field :note, :string
-    field :account_id, :binary_id
-    field :user_id, :binary_id
 
+    belongs_to :account, Account
+    belongs_to :user, User
     belongs_to :gain_category, Schema.GainCategory
 
     field :deleted_at, :utc_datetime
@@ -73,7 +76,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
       :description,
       :amount,
       :date_receipt,
-      :fix,
+      :fix?,
       :account_id,
       :user_id,
       :gain_category_id
@@ -89,7 +92,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
       :description,
       :amount,
       :date_receipt,
-      :fix,
+      :fix?,
       :account_id,
       :tag,
       :attachment,
@@ -108,7 +111,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
       :description,
       :amount,
       :date_receipt,
-      :fix,
+      :fix?,
       :account_id,
       :user_id,
       :gain_category_id

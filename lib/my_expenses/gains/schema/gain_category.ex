@@ -18,13 +18,16 @@ defmodule MyExpenses.Gains.Schema.GainCategory do
           updated_at: DateTime.t()
         }
 
-  schema "gains_category" do
-    field(:name, :string)
-    field(:description, :string)
-    field(:icon, :string)
-    field(:color, :string)
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
-    has_many(:gain, Schema.Gain)
+  schema "gains_category" do
+    field :name, :string
+    field :description, :string
+    field :icon, :string
+    field :color, :string
+
+    has_many :gain, Schema.Gain
 
     timestamps(
       inserted_at: :created_at,

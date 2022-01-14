@@ -3,9 +3,7 @@ defmodule MyExpenses.GainsTest do
 
   use MyExpenses.Support.DataCase, async: true
 
-  import MyExpenses.Support.Accounts
-  import MyExpenses.Support.Gains
-  import MyExpenses.Support.Users
+  import MyExpenses.Factories
 
   alias MyExpenses.Gains
   alias MyExpenses.Gains.Schema
@@ -43,7 +41,7 @@ defmodule MyExpenses.GainsTest do
     end
 
     test "retorna nil caso o id informado não exista" do
-      refute Gains.show_gain_category(0)
+      refute Gains.show_gain_category(Faker.UUID.v4())
     end
   end
 
@@ -129,9 +127,9 @@ defmodule MyExpenses.GainsTest do
     test "lista todos os ganhos do usuario", context do
       %{user: user, account: account, gain: gain} = context
 
-      another_account = create_account(user)
+      another_account = insert(:account, user: user)
 
-      another_gain = create_gain(user, %{account_id: another_account.id})
+      another_gain = insert(:gain, user: user, account: another_account)
 
       user_id = user.id
       gain_id = gain.id
@@ -148,7 +146,7 @@ defmodule MyExpenses.GainsTest do
                  tag: _,
                  note: _,
                  date_receipt: _,
-                 fix: _,
+                 fix?: _,
                  frequency: _,
                  account_id: ^account_id,
                  user_id: ^user_id,
@@ -162,7 +160,7 @@ defmodule MyExpenses.GainsTest do
                  tag: _,
                  note: _,
                  date_receipt: _,
-                 fix: _,
+                 fix?: _,
                  frequency: _,
                  account_id: ^another_account_id,
                  user_id: ^user_id,
@@ -210,7 +208,7 @@ defmodule MyExpenses.GainsTest do
         tag: "salario mensal",
         note: "mês abril",
         date_receipt: ~D[2021-04-11],
-        fix: false,
+        fix?: false,
         account_id: account_id,
         user_id: user_id
       }
@@ -220,7 +218,7 @@ defmodule MyExpenses.GainsTest do
       assert {:ok,
               %{
                 amount: ^amount,
-                fix: false,
+                fix?: false,
                 account_id: ^account_id,
                 user_id: ^user_id,
                 gain_category_id: ^category_id
@@ -231,26 +229,24 @@ defmodule MyExpenses.GainsTest do
     end
   end
 
-  defp setup_category_gain(_) do
-    %{category: create_gain_category()}
-  end
+  defp setup_category_gain(_), do: %{category: insert(:gain_category)}
 
   defp setup_gains(_) do
-    user = create_user()
+    user = insert(:user)
 
-    account = create_account(user)
+    account = insert(:account, user: user)
 
-    gain = create_gain(user, %{account_id: account.id})
+    gain = insert(:gain, user: user, account: account)
 
     %{user: user, account: account, gain: gain}
   end
 
   defp prepares_for_insert_gain(_) do
-    user = create_user()
+    user = insert(:user)
 
-    category = create_gain_category()
+    category = insert(:gain_category)
 
-    account = create_account(user)
+    account = insert(:account, user: user)
 
     %{user: user, category: category, account: account}
   end

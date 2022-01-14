@@ -44,7 +44,7 @@ defmodule MyExpenses.Support.Gains do
       tag: Enum.random(["launch work", "date with my girlfriend", "beer", "house", "music"]),
       note: Faker.Dog.PtBr.characteristic(),
       date_receipt: Faker.Date.between(~D[2021-01-01], ~D[2022-12-25]),
-      fix: boolean_fix,
+      fix?: boolean_fix,
       frequency: frequency,
       account_id: Faker.UUID.v4(),
       user_id: user.id,
