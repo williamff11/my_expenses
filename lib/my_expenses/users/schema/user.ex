@@ -59,6 +59,10 @@ defmodule MyExpenses.Users.Schema.User do
     |> validate_changeset(fields)
   end
 
+  @spec update_changeset(
+          MyExpenses.Users.Schema.User.t(),
+          :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}
+        ) :: Ecto.Changeset.t()
   def update_changeset(%__MODULE__{} = struct, params) do
     fields = [:email, :phone, :password]
 
