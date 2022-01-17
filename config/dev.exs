@@ -30,6 +30,8 @@ config :my_expenses, MyExpensesWeb.Endpoint,
     ]
   ]
 
+config :my_expenses, MyExpensesWeb.Auth, secret_key: "SECRET"
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

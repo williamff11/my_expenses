@@ -3,7 +3,7 @@ defmodule MyExpenses.UserTest do
 
   import MyExpenses.Support.Users
 
-  alias MyExpenses.User
+  alias MyExpenses.Users
   alias MyExpenses.Users.Schema
 
   describe "list_usuarios" do
@@ -25,11 +25,11 @@ defmodule MyExpenses.UserTest do
                  login: _,
                  deleted_at: nil
                }
-             ] = User.list_users()
+             ] = Users.list_users()
 
       new_usuario = create_user()
 
-      User.delete_user(new_usuario)
+      Users.delete_user(new_usuario)
 
       assert [
                %Schema.User{
@@ -42,13 +42,13 @@ defmodule MyExpenses.UserTest do
                  login: _,
                  deleted_at: nil
                }
-             ] = User.list_users()
+             ] = Users.list_users()
     end
 
     test "lista todos os usuários deletados", context do
       %{user: user} = context
 
-      User.delete_user(user)
+      Users.delete_user(user)
 
       assert [
                %Schema.User{
@@ -62,11 +62,11 @@ defmodule MyExpenses.UserTest do
                  password: _,
                  deleted_at: _
                }
-             ] = User.list_only_trash()
+             ] = Users.list_only_trash()
     end
   end
 
-  describe "show_user" do
+  describe "get_user" do
     setup :setup_user
 
     test "show usuario", context do
@@ -80,7 +80,7 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user(user_id)
+             } = Users.get_user(user_id)
     end
 
     test "só mostra o usuário caso ele não esteja deletado", context do
@@ -96,10 +96,10 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user(user_id)
+             } = Users.get_user(user_id)
 
-      User.delete_user(user)
-      refute User.show_user(user_id)
+      Users.delete_user(user)
+      refute Users.get_user(user_id)
     end
 
     test "show usuario deletado", context do
@@ -107,7 +107,7 @@ defmodule MyExpenses.UserTest do
 
       user_id = user.id
 
-      User.delete_user(user)
+      Users.delete_user(user)
 
       assert %Schema.User{
                id: ^user_id,
@@ -117,7 +117,7 @@ defmodule MyExpenses.UserTest do
                birth_date: _,
                cpf: _,
                login: _
-             } = User.show_user_deleted(user_id)
+             } = Users.get_user_deleted(user_id)
     end
   end
 
@@ -130,7 +130,7 @@ defmodule MyExpenses.UserTest do
         password: "123456"
       }
 
-      assert {:error, errors} = User.create_user(params)
+      assert {:error, errors} = Users.create_user(params)
 
       assert errors_on(errors) == %{
                birth_date: ["can't be blank"],
@@ -160,7 +160,7 @@ defmodule MyExpenses.UserTest do
                 password: "123456",
                 login: "michael",
                 deleted_at: nil
-              }} = User.create_user(params)
+              }} = Users.create_user(params)
     end
   end
 
@@ -187,7 +187,7 @@ defmodule MyExpenses.UserTest do
                 login: ^login_original,
                 password: ^password_original,
                 deleted_at: nil
-              }} = User.update_user(user, params_update)
+              }} = Users.update_user(user, params_update)
     end
   end
 
@@ -203,7 +203,7 @@ defmodule MyExpenses.UserTest do
               %Schema.User{
                 id: ^user_id,
                 deleted_at: deleted_at
-              }} = User.delete_user(user)
+              }} = Users.delete_user(user)
 
       assert deleted_at
     end

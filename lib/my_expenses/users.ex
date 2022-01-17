@@ -1,4 +1,4 @@
-defmodule MyExpenses.User do
+defmodule MyExpenses.Users do
   @moduledoc """
   Módulo responsável por cuidar da regra de negócio dos usuários.
   """
@@ -25,8 +25,7 @@ defmodule MyExpenses.User do
   """
   @spec list_users() :: [User.t()]
   def list_users do
-    Query.UserQuery.all_users()
-    |> MyExpenses.Repo.all()
+    MyExpenses.Repo.all(Query.UserQuery.all_users())
   end
 
   @doc """
@@ -34,8 +33,7 @@ defmodule MyExpenses.User do
   """
   @spec list_only_trash() :: [%User{deleted_at: nil}]
   def list_only_trash do
-    Query.UserQuery.only_trash()
-    |> MyExpenses.Repo.all()
+    MyExpenses.Repo.all(Query.UserQuery.only_trash())
   end
 
   @doc """
@@ -51,8 +49,8 @@ defmodule MyExpenses.User do
   @doc """
   Retorna o usuário com o id informado
   """
-  @spec show_user(user_filter_params()) :: User.t() | nil
-  def show_user(user_id) do
+  @spec get_user(user_filter_params()) :: User.t() | nil
+  def get_user(user_id) do
     Query.UserQuery.get_user(user_id)
     |> MyExpenses.Repo.one()
   end
@@ -60,8 +58,8 @@ defmodule MyExpenses.User do
   @doc """
   Retorna o usuário deletado com o id informado
   """
-  @spec show_user_deleted(user_filter_params()) :: %User{deleted_at: nil} | nil
-  def show_user_deleted(user_id) do
+  @spec get_user_deleted(user_filter_params()) :: %User{deleted_at: nil} | nil
+  def get_user_deleted(user_id) do
     Query.UserQuery.get_user_deleted(user_id)
     |> MyExpenses.Repo.one()
   end

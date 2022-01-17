@@ -13,6 +13,10 @@ defmodule MyExpensesWeb.Router do
     plug :accepts, ["json"]
   end
 
+  pipeline :auth do
+    plug MyExpensesWeb.Auth
+  end
+
   scope "/", MyExpensesWeb do
     pipe_through :browser
 

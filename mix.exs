@@ -51,6 +51,7 @@ defmodule MyExpenses.MixProject do
       {:ex_machina, "~> 2.7.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
+      {:jose, "~> 1.10.1"},
       {:phoenix, "~> 1.5.3"},
       {:phoenix_ecto, "~> 4.1"},
       {:postgrex, ">= 0.0.0"},
