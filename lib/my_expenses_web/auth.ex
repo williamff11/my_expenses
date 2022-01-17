@@ -20,7 +20,7 @@ defmodule MyExpensesWeb.Auth do
   def call(%Plug.Conn{} = conn, opts) do
     with {:ok, header} <- fetch_authorization_header(conn),
          {:ok, token} <- extract_token_from_header(header),
-         {:ok, jwt} <- validate_token(token, opts),
+         {:ok, jwt} <- validate_token_assignature(token, opts),
          {:ok, jwt} <- validate_jwt_expiration(jwt),
          {:ok, user} <- fetch_user_from_jwt(jwt) do
       conn
@@ -50,7 +50,7 @@ defmodule MyExpensesWeb.Auth do
     {:error, :invalid_authorization_header}
   end
 
-  defp validate_token(header, opts) do
+  defp validate_token_assignature(header, opts) do
     case JOSE.JWT.verify_strict(opts.jwk, ["HS256"], header) do
       {true, jwt, _jws} -> {:ok, jwt}
       {false, _jwt, _jws} -> {:error, :invalid_signature}

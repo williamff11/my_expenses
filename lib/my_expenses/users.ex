@@ -25,8 +25,7 @@ defmodule MyExpenses.Users do
   """
   @spec list_users() :: [User.t()]
   def list_users do
-    Query.UserQuery.all_users()
-    |> MyExpenses.Repo.all()
+    MyExpenses.Repo.all(Query.UserQuery.all_users())
   end
 
   @doc """
@@ -34,8 +33,7 @@ defmodule MyExpenses.Users do
   """
   @spec list_only_trash() :: [%User{deleted_at: nil}]
   def list_only_trash do
-    Query.UserQuery.only_trash()
-    |> MyExpenses.Repo.all()
+    MyExpenses.Repo.all(Query.UserQuery.only_trash())
   end
 
   @doc """

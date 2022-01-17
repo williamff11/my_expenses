@@ -20,7 +20,7 @@ defmodule MyExpensesWeb.Api.AuthTest do
   test "retorna 401 caso não seja informado o header 'authorization'", %{opts: opts} do
     conn = :get |> conn("/") |> MyExpensesWeb.Auth.call(opts)
 
-    assert %{status: 401, state: :sent, halted: true} = true
+    assert %{status: 401, state: :sent, halted: true} = conn
     assert %{reason: "missing_authorization_header"} = decode_body(conn)
   end
 
@@ -100,7 +100,7 @@ defmodule MyExpensesWeb.Api.AuthTest do
   end
 
   defp generate_token_jwt(secret, user, params \\ %{}) do
-    expiration_in_millisecond = :os.system_time(:millisecond) + :timer.hours(1)
+    expiration_in_millisecond = :os.system_time(:millisecond) + :timer.minutes(5)
 
     params =
       Enum.into(params, %{
@@ -109,15 +109,10 @@ defmodule MyExpensesWeb.Api.AuthTest do
       })
 
     secret
-    |> IO.inspect()
     |> JOSE.JWK.from_oct()
-    |> IO.inspect()
     |> JOSE.JWT.sign(%{"alg" => "HS256"}, params)
-    |> IO.inspect()
     |> JOSE.JWS.compact()
-    |> IO.inspect()
     |> elem(1)
-    |> IO.inspect()
   end
 
   defp decode_body(conn) do

@@ -40,4 +40,34 @@ defmodule MyExpensesWeb.ConnCase do
 
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
+
+  def authenticated(conn, user) do
+    token =
+      :my_expenses
+      |> Application.get_env(MyExpensesWeb.Auth)
+      |> Keyword.fetch!(:secret_key)
+      |> generate_token_jwt(user)
+
+    Plug.Conn.put_req_header(conn, "authorization", "Bearer #{token}")
+  end
+
+  def basic_auth(conn, token) do
+    Plug.Conn.put_req_header(conn, "authorization", "Basic " <> Base.encode64(token))
+  end
+
+  defp generate_token_jwt(secret, user, params \\ %{}) do
+    expiration_in_millis = :os.system_time(:millisecond) + :timer.minutes(15)
+
+    params =
+      Enum.into(params, %{
+        "user" => user.id,
+        "exp" => expiration_in_millis / 1000
+      })
+
+    secret
+    |> JOSE.JWK.from_oct()
+    |> JOSE.JWT.sign(%{"alg" => "HS256"}, params)
+    |> JOSE.JWS.compact()
+    |> elem(1)
+  end
 end
