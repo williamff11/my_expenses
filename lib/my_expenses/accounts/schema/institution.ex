@@ -10,6 +10,7 @@ defmodule MyExpenses.Accounts.Schema.Institution do
           name: String.t(),
           legal_name: String.t()
         }
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   schema "institutions" do

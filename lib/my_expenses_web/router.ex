@@ -23,6 +23,25 @@ defmodule MyExpensesWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "/api/v1", MyExpensesWeb.Api.V1.Controllers do
+    pipe_through :api
+    pipe_through :auth
+
+    resources "accounts", AccountController, only: [:index, :show, :create, :update, :delete]
+
+    get "/expenses", ExpenseController, :index_expenses
+    get "/expenses/:id", ExpenseController, :show_expense
+    post "/expenses", ExpenseController, :create_expense
+    put "/expenses/:id", ExpenseController, :update_expense
+    delete "/expenses/:id", ExpenseController, :delete_expense
+
+    get "/expense_categories", ExpenseController, :index_expense_categories
+    get "/expense_categories/:id", ExpenseController, :show_expense_category
+    post "/expense_categories", ExpenseController, :create_expense_category
+    put "/expense_categories/:id", ExpenseController, :update_expense_category
+    delete "/expense_categories/:id", ExpenseController, :delete_expense_category
+  end
+
   # Other scopes may use custom stacks.
   # scope "/api", MyExpensesWeb do
   #   pipe_through :api

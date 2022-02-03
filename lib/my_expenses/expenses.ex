@@ -44,17 +44,15 @@ defmodule MyExpenses.Expenses do
   Lista todas as categorias de gastos.
   """
   @spec list_expense_category() :: [Schema.ExpenseCategory.t()] | []
-  def list_expense_category do
-    ExpensesQuery.get_expense_categories()
-    |> MyExpenses.Repo.all()
-  end
+  def list_expense_category, do: MyExpenses.Repo.all(ExpensesQuery.get_expense_categories())
 
   @doc """
   Lista todas os gastos que são fixos conforme os parâmetros.
   """
   @spec list_expenses_fixed_by(%{}) :: [%Schema.Expense{}] | nil
   def list_expenses_fixed_by(params \\ %{}) do
-    ExpensesQuery.get_expenses_fixed_by(params)
+    params
+    |> ExpensesQuery.get_expenses_fixed_by()
     |> MyExpenses.Repo.all()
     |> MyExpenses.Repo.preload(:expense_category)
   end
@@ -73,12 +71,9 @@ defmodule MyExpenses.Expenses do
   @doc """
   Mostra a categoria de gastos pertencente ao id informado.
   """
-  @spec show_expense_category(expense_category_filter_params()) ::
+  @spec get_expense_category(expense_category_filter_params()) ::
           Schema.ExpenseCategory.t() | nil
-  def show_expense_category(category_id) do
-    Schema.ExpenseCategory
-    |> MyExpenses.Repo.get(category_id)
-  end
+  def get_expense_category(category_id), do: MyExpenses.Repo.get(Schema.ExpenseCategory, category_id)
 
   @doc """
   Cria uma nova categoria de gastos conforme os parâmetros informados.
@@ -104,12 +99,9 @@ defmodule MyExpenses.Expenses do
   @doc """
   Deleta a categoria de gastos informada.
   """
-  @spec delete_expense_category(expense_category_filter_params) :: callback_expense_category()
-  def delete_expense_category(expense_category_id) do
-    Schema.ExpenseCategory
-    |> MyExpenses.Repo.get!(expense_category_id)
-    |> MyExpenses.Repo.delete()
-  end
+  @spec delete_expense_category(Schema.ExpenseCategory.t()) :: callback_expense_category()
+  def delete_expense_category(%Schema.ExpenseCategory{} = expense_category),
+    do: MyExpenses.Repo.delete(expense_category)
 
   @doc """
   Retorna uma lista de gastos conforme os dados informados.
@@ -128,21 +120,21 @@ defmodule MyExpenses.Expenses do
   @doc """
   Mostra o gasto que possui o ID informado
   """
-  @spec show_expense(id: UUID.t()) :: Schema.Expense.t() | nil
-  def show_expense(id) do
-    ExpensesQuery.get_expenses_by(%{id: id, deleted_at: false})
+  @spec get_expense(id: UUID.t()) :: Schema.Expense.t() | nil
+  def get_expense(id), do: MyExpenses.Repo.get(Schema.Expense, id)
+
+  def get_expense_by(params) do
+    params
+    |> ExpensesQuery.get_expenses_by()
     |> MyExpenses.Repo.one()
-    |> MyExpenses.Repo.preload(:expense_category)
   end
 
   @doc """
   Cria um gasto com os dados passados como parâmetros.
   """
-  @spec create_expense(Schema.ExpenseCategory.t(), expenses_params()) :: callback_expenses()
-  def create_expense(%Schema.ExpenseCategory{} = expense_category, params) do
-    %Schema.Expense{
-      expense_category_id: expense_category.id
-    }
+  @spec create_expense(expenses_params()) :: callback_expenses()
+  def create_expense(params) do
+    %Schema.Expense{}
     |> Schema.Expense.create_changeset(params)
     |> MyExpenses.Repo.insert()
   end

@@ -18,9 +18,7 @@ defmodule MyExpenses.Accounts do
   Lista todas as instituições financeiras cadastradas no sistema.
   """
   @spec list_institutions :: [%Schema.Institution{}] | nil
-  def list_institutions do
-    MyExpenses.Repo.all(Schema.Institution)
-  end
+  def list_institutions, do: MyExpenses.Repo.all(Schema.Institution)
 
   @doc """
   Retorna uma lista de contas conforme os parametros passados.
@@ -31,7 +29,8 @@ defmodule MyExpenses.Accounts do
   def list_accounts_by(%{} = params) do
     if not (:user_id in Map.keys(params)), do: raise("key user_id is required")
 
-    AccountsQuery.list_accounts_by(params)
+    params
+    |> AccountsQuery.list_accounts_by()
     |> MyExpenses.Repo.all()
     |> MyExpenses.Repo.preload(:institution)
   end
@@ -39,8 +38,8 @@ defmodule MyExpenses.Accounts do
   @doc """
   Retorna a conta caso o id do usuário seja o mesmo que a conta informada via id.
   """
-  @spec show_account(UUID.t(), UUID.t()) :: Schema.Account.t() | nil
-  def show_account(user_id, account_id) do
+  @spec get_account(UUID.t(), UUID.t()) :: Schema.Account.t() | nil
+  def get_account(user_id, account_id) do
     user_id
     |> AccountsQuery.get_account(account_id)
     |> MyExpenses.Repo.one()
@@ -63,7 +62,7 @@ defmodule MyExpenses.Accounts do
   @spec update_account(UUID.t(), UUID.t(), %{}) ::
           {:ok, Schema.Account.t()} | {:error, Ecto.Changeset.error()}
   def update_account(user_id, account_id, %{} = params) do
-    account = show_account(user_id, account_id)
+    account = get_account(user_id, account_id)
 
     if account == nil, do: raise("account not found")
 
@@ -77,11 +76,10 @@ defmodule MyExpenses.Accounts do
   """
   @spec delete_account(UUID.t(), UUID.t()) :: {:ok, Schema.Account.t()}
   def delete_account(user_id, account_id) do
-    account = show_account(user_id, account_id)
+    account = get_account(user_id, account_id)
 
     if account == nil, do: raise("account not found")
 
-    account
-    |> MyExpenses.Repo.delete()
+    MyExpenses.Repo.delete(account)
   end
 end
