@@ -28,6 +28,7 @@ defmodule MyExpensesWeb.Router do
     pipe_through :auth
 
     resources "accounts", AccountController, only: [:index, :show, :create, :update, :delete]
+    resources "users", UserController, only: [:index, :show, :create, :update, :delete]
 
     get "/expense_categories", ExpenseController, :index_expense_categories
     get "/expense_categories/:id", ExpenseController, :show_expense_category

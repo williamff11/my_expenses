@@ -24,17 +24,13 @@ defmodule MyExpenses.Users do
   Lista usuário(s) conforme paramêtro
   """
   @spec list_users() :: [User.t()]
-  def list_users do
-    MyExpenses.Repo.all(Query.UserQuery.all_users())
-  end
+  def list_users, do: MyExpenses.Repo.all(Query.UserQuery.all_users())
 
   @doc """
   Lista somente os usuários deletados
   """
   @spec list_only_trash() :: [%User{deleted_at: nil}]
-  def list_only_trash do
-    MyExpenses.Repo.all(Query.UserQuery.only_trash())
-  end
+  def list_only_trash, do: MyExpenses.Repo.all(Query.UserQuery.only_trash())
 
   @doc """
   Cria um usuário conforme os parâmetros passados
@@ -50,17 +46,15 @@ defmodule MyExpenses.Users do
   Retorna o usuário com o id informado
   """
   @spec get_user(user_filter_params()) :: User.t() | nil
-  def get_user(user_id) do
-    Query.UserQuery.get_user(user_id)
-    |> MyExpenses.Repo.one()
-  end
+  def get_user(user_id), do: MyExpenses.Repo.get(User, user_id)
 
   @doc """
   Retorna o usuário deletado com o id informado
   """
   @spec get_user_deleted(user_filter_params()) :: %User{deleted_at: nil} | nil
   def get_user_deleted(user_id) do
-    Query.UserQuery.get_user_deleted(user_id)
+    user_id
+    |> Query.UserQuery.get_user_deleted()
     |> MyExpenses.Repo.one()
   end
 
@@ -82,7 +76,8 @@ defmodule MyExpenses.Users do
   def delete_user(%User{} = user) do
     deleted_at = DateTime.truncate(Timex.now(), :second)
 
-    Ecto.Changeset.change(user, %{deleted_at: deleted_at})
+    user
+    |> Ecto.Changeset.change(%{deleted_at: deleted_at})
     |> MyExpenses.Repo.update()
   end
 end
