@@ -26,9 +26,9 @@ defmodule MyExpenses.ExpensesTest do
     end
   end
 
-  describe "show_expense_category" do
+  describe "get_expense_category" do
     test "retorna nil ao passar uma categoria que não existe" do
-      refute Expenses.show_expense_category(Faker.UUID.v4())
+      refute Expenses.get_expense_category(Faker.UUID.v4())
     end
 
     test "mostra determinada categoria de gastos, filtrando por id" do
@@ -42,7 +42,7 @@ defmodule MyExpenses.ExpensesTest do
                description: _,
                icon: _,
                color: _
-             } = Expenses.show_expense_category(category_id)
+             } = Expenses.get_expense_category(category_id)
     end
   end
 
@@ -123,7 +123,7 @@ defmodule MyExpenses.ExpensesTest do
                %Schema.ExpenseCategory{id: ^category_id}
              } = Expenses.delete_expense_category(category_id)
 
-      refute Expenses.show_expense_category(category_id)
+      refute Expenses.get_expense_category(category_id)
     end
   end
 
@@ -329,7 +329,7 @@ defmodule MyExpenses.ExpensesTest do
     end
   end
 
-  describe "show_expenses/2" do
+  describe "get_expenses/2" do
     setup :setup_expenses
 
     test "mostra todos os atributos de um gasto", context do
@@ -351,12 +351,12 @@ defmodule MyExpenses.ExpensesTest do
                frequency: _,
                account_id: _,
                user_id: ^user_id,
-               expense_category: %{id: ^expense_category_id}
-             } = Expenses.show_expense(expense.id)
+               expense_category_id: ^expense_category_id
+             } = Expenses.get_expense(expense.id)
     end
 
     test "nil caso o gasto não exita" do
-      refute Expenses.show_expense(Faker.UUID.v4())
+      refute Expenses.get_expense(Faker.UUID.v4())
     end
   end
 
@@ -370,7 +370,7 @@ defmodule MyExpenses.ExpensesTest do
       account_id = account.id
       user_id = user.id
 
-      params = params_for(:expense, account: account, user: user)
+      params = params_for(:expense, account: account, user: user, expense_category: category)
 
       assert {:ok,
               %Schema.Expense{
@@ -378,7 +378,7 @@ defmodule MyExpenses.ExpensesTest do
                 fix?: false,
                 account_id: ^account_id,
                 user_id: ^user_id
-              }} = Expenses.create_expense(category, params)
+              }} = Expenses.create_expense(params)
     end
 
     test "cria um gasto somente com os dados básicos", context do
@@ -388,7 +388,7 @@ defmodule MyExpenses.ExpensesTest do
       account_id = account.id
       user_id = user.id
 
-      params = params_for(:expense, account: account, user: user)
+      params = params_for(:expense, account: account, user: user, expense_category: category)
 
       assert {:ok,
               %Schema.Expense{
@@ -396,7 +396,7 @@ defmodule MyExpenses.ExpensesTest do
                 fix?: false,
                 account_id: ^account_id,
                 user_id: ^user_id
-              }} = Expenses.create_expense(category, params)
+              }} = Expenses.create_expense(params)
     end
 
     test "retorna erro ao passar parametros errados na criação de um gasto" do
@@ -407,10 +407,11 @@ defmodule MyExpenses.ExpensesTest do
         date_spend: ~D[2021-01-26],
         payed?: nil,
         fix?: nil,
-        user_id: 0
+        user_id: 0,
+        expense_category_id: category.id
       }
 
-      assert {:error, %Ecto.Changeset{errors: errors}} = Expenses.create_expense(category, params)
+      assert {:error, %Ecto.Changeset{errors: errors}} = Expenses.create_expense(params)
 
       assert errors:
                [
@@ -514,7 +515,8 @@ defmodule MyExpenses.ExpensesTest do
       expense_id = expense.id
       assert {:ok, %Schema.Expense{id: ^expense_id}} = Expenses.delete_expense(expense)
 
-      refute Expenses.show_expense(expense_id)
+      assert %{deleted_at: deleted_at} = Expenses.get_expense(expense_id)
+      assert deleted_at != nil
     end
   end
 

@@ -26,7 +26,7 @@ defmodule MyExpenses.Accounts.Schema.Account do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__, :institution, :user]}
 
   schema "accounts" do
     field :name, :string

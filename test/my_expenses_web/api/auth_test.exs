@@ -5,8 +5,6 @@ defmodule MyExpensesWeb.Api.AuthTest do
 
   import MyExpenses.Factories
 
-  alias MyExpenses.Users.Schema.User
-
   setup do
     secret = "1234"
 
@@ -94,7 +92,7 @@ defmodule MyExpensesWeb.Api.AuthTest do
              halted: false,
              assigns: %{
                jwt: %JOSE.JWT{},
-               user: %User{id: ^user_id}
+               user_id: ^user_id
              }
            } = conn
   end

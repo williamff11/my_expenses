@@ -34,7 +34,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__, :account, :user, :gain_category]}
 
   schema "gains" do
     field :description, :string
@@ -87,7 +87,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
     |> validate_changeset()
   end
 
-  def update_changeset(%__MODULE__{} = struct, params) do
+  def update_changeset(%__MODULE__{} = gain, params) do
     fields = [
       :description,
       :amount,
@@ -101,7 +101,7 @@ defmodule MyExpenses.Gains.Schema.Gain do
       :gain_category_id
     ]
 
-    struct
+    gain
     |> cast(params, fields)
     |> validate_changeset()
   end

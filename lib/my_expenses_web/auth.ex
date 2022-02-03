@@ -25,7 +25,7 @@ defmodule MyExpensesWeb.Auth do
          {:ok, user} <- fetch_user_from_jwt(jwt) do
       conn
       |> assign(:jwt, jwt)
-      |> assign(:user, user)
+      |> assign(:user_id, user.id)
     else
       {:error, reason} ->
         conn

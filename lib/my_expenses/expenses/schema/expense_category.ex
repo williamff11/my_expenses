@@ -23,7 +23,7 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
-  @derive {Jason.Encoder, except: [:__meta__, :__struct__]}
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__, :expense]}
 
   schema "expenses_category" do
     field(:name, :string)

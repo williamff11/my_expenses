@@ -23,7 +23,19 @@ defmodule MyExpensesWeb do
 
       import Plug.Conn
       import MyExpensesWeb.Gettext
+      import MyExpensesWeb.Phoenix.Controller
+
       alias MyExpensesWeb.Router.Helpers, as: Routes
+
+      def get_user_id_by_conn(%Plug.Conn{assigns: assigns}) do
+        with jwt when not is_nil(jwt) <- Map.get(assigns, :jwt),
+             fields when not is_nil(fields) <- Map.get(jwt, :fields),
+             user_id <- Map.get(fields, "user") do
+          user_id
+        else
+          _ -> {:error, "invalid_jwt"}
+        end
+      end
     end
   end
 

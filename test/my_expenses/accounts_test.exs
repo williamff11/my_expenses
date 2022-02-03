@@ -79,14 +79,14 @@ defmodule MyExpenses.AccountsTest do
     end
   end
 
-  describe "show_accounts_by/2" do
+  describe "get_accounts_by/2" do
     setup :setup_account
 
     test "retorna nil caso o usuario informado não seja o dono da conta", context do
       %{account: account} = context
       user = insert(:user)
 
-      refute Accounts.show_account(user.id, account.id)
+      refute Accounts.get_account(user.id, account.id)
     end
 
     test "retorna nil caso a conta informada não seja do dono da conta", context do
@@ -95,7 +95,7 @@ defmodule MyExpenses.AccountsTest do
       outher_user = insert(:user)
       account = insert(:account, user: outher_user)
 
-      refute Accounts.show_account(user.id, account.id)
+      refute Accounts.get_account(user.id, account.id)
     end
 
     test "retorna a conta caso o usuario seja dono da conta", context do
@@ -113,7 +113,7 @@ defmodule MyExpenses.AccountsTest do
                description: _,
                initial_amount_value: _,
                user_id: ^user_id
-             } = Accounts.show_account(user_id, account.id)
+             } = Accounts.get_account(user_id, account.id)
     end
   end
 

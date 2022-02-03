@@ -5,7 +5,7 @@ defmodule MyExpenses.Factories.GainFactory do
 
       def gain_category_factory do
         %Schema.GainCategory{
-          name: Faker.Cannabis.category(),
+          name: sequence(:name, &"gain-#{&1}"),
           description: Faker.Dog.PtBr.characteristic(),
           icon: Faker.Avatar.image_url(),
           color: "#" <> Faker.Color.rgb_hex()
