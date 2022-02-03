@@ -21,6 +21,8 @@ defmodule MyExpenses.Gains.Schema.GainCategory do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @derive {Jason.Encoder, except: [:__meta__, :__struct__, :gain]}
+
   schema "gains_category" do
     field :name, :string
     field :description, :string

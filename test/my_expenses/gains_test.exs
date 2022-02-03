@@ -17,13 +17,13 @@ defmodule MyExpenses.GainsTest do
       assert [
                %Schema.GainCategory{} = gain_category
                | _
-             ] = Gains.list_gains_category()
+             ] = Gains.list_gain_categories()
 
       assert gain_category.id == category.id
     end
   end
 
-  describe "show_gain_category/1" do
+  describe "get_gain_category/1" do
     setup :setup_category_gain
 
     test "retorna a categoria passada via id", context do
@@ -37,11 +37,11 @@ defmodule MyExpenses.GainsTest do
                description: _,
                icon: _,
                color: _
-             } = Gains.show_gain_category(category_id)
+             } = Gains.get_gain_category(category_id)
     end
 
     test "retorna nil caso o id informado não exista" do
-      refute Gains.show_gain_category(Faker.UUID.v4())
+      refute Gains.get_gain_category(Faker.UUID.v4())
     end
   end
 
@@ -115,9 +115,9 @@ defmodule MyExpenses.GainsTest do
 
       category_id = category.id
 
-      {:ok, _} = Gains.delete_gain_category(category_id)
+      {:ok, _} = Gains.delete_gain_category(category)
 
-      refute Gains.show_gain_category(category_id)
+      refute Gains.get_gain_category(category_id)
     end
   end
 
@@ -171,7 +171,7 @@ defmodule MyExpenses.GainsTest do
     end
   end
 
-  describe "show_gain/1" do
+  describe "get_gain/1" do
     setup :setup_gains
 
     test "retorna o ganho conforme parametros informados", context do
@@ -183,11 +183,11 @@ defmodule MyExpenses.GainsTest do
       assert %Schema.Gain{
                id: ^gain_id,
                user_id: ^user_id
-             } = Gains.show_gain(gain_id)
+             } = Gains.get_gain(gain_id)
     end
 
     test "nil caso o ganho não exita" do
-      refute Gains.show_gain(Faker.UUID.v4())
+      refute Gains.get_gain(Faker.UUID.v4())
     end
   end
 
@@ -210,7 +210,8 @@ defmodule MyExpenses.GainsTest do
         date_receipt: ~D[2021-04-11],
         fix?: false,
         account_id: account_id,
-        user_id: user_id
+        user_id: user_id,
+        gain_category_id: category_id
       }
 
       amount = Decimal.new("8000")
@@ -222,10 +223,84 @@ defmodule MyExpenses.GainsTest do
                 account_id: ^account_id,
                 user_id: ^user_id,
                 gain_category_id: ^category_id
-              }} = Gains.create_gain(category, params)
+              }} = Gains.create_gain(params)
     end
 
     test "erro ao passar os parametros errados" do
+    end
+  end
+
+  describe "update_gain/2" do
+    setup :setup_gains
+
+    test "realiza um update no gain conforme os parâmetros", context do
+      %{gain: gain, user: user} = context
+
+      gain_id = gain.id
+      user_id = user.id
+
+      params = %{
+        date_receipt: ~D[2019-09-20],
+        description: "side_job"
+      }
+
+      assert {:ok,
+              %Schema.Gain{
+                id: ^gain_id,
+                date_receipt: ~D[2019-09-20],
+                description: "side_job",
+                user_id: ^user_id
+              }} = Gains.update_gain(gain, params)
+    end
+
+    test "realiza um update trocando a conta do recebimento", context do
+      %{gain: gain, user: user} = context
+
+      another_account_id = insert(:account, user: user).id
+      gain_id = gain.id
+      user_id = user.id
+
+      params = %{
+        account_id: another_account_id
+      }
+
+      assert {:ok,
+              %Schema.Gain{
+                id: ^gain_id,
+                account_id: ^another_account_id,
+                user_id: ^user_id
+              }} = Gains.update_gain(gain, params)
+    end
+
+    test "erro ao tentar raelizar update com os parâmtros inválidos", context do
+      %{gain: gain} = context
+
+      params = %{
+        amount: 0,
+        fix?: nil,
+        account_id: 0
+      }
+
+      assert {:error, %Ecto.Changeset{errors: errors}} = Gains.update_gain(gain, params)
+
+      assert errors:
+               [
+                 amount: {"must be greater than %{number}", _},
+                 fix?: {"can't be blank", [validation: :required]},
+                 account_id: {"is invalid", [type: :binary_id, validation: :cast]}
+               ] = errors
+    end
+  end
+
+  describe "delete_gain/2" do
+    setup :setup_gains
+
+    test "deleta de forma lógica o gain", %{gain: gain} do
+      gain_id = gain.id
+      assert {:ok, %Schema.Gain{id: ^gain_id}} = Gains.delete_gain(gain)
+
+      assert %{deleted_at: deleted_at} = Gains.get_gain(gain_id)
+      assert deleted_at != nil
     end
   end
 

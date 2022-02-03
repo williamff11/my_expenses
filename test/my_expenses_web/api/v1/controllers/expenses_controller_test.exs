@@ -4,7 +4,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
   import MyExpenses.Factories
 
   @endpoint_expenses "/api/v1/expenses"
-  @endpoint_expense_category "/api/v1/expense_categories"
+  @endpoint_expense_categories "/api/v1/expense_categories"
 
   setup do
     user = insert(:user)
@@ -28,7 +28,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         conn
         |> authenticated(user)
-        |> get(@endpoint_expense_category)
+        |> get(@endpoint_expense_categories)
         |> json_response(200)
 
       assert [%{"id" => _, "icon" => _} | _] = result
@@ -44,7 +44,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         conn
         |> authenticated(user)
-        |> get(@endpoint_expense_category <> "/#{expense_category_id}", params)
+        |> get(@endpoint_expense_categories <> "/#{expense_category_id}", params)
         |> json_response(200)
 
       assert %{"color" => _, "id" => ^expense_category_id} = result
@@ -58,7 +58,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         build_conn()
         |> authenticated(user)
-        |> post(@endpoint_expense_category, %{"expense_category" => expense_category_params})
+        |> post(@endpoint_expense_categories, %{"expense_category" => expense_category_params})
         |> json_response(201)
 
       assert %{"color" => "#FFF"} = result
@@ -70,7 +70,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         build_conn()
         |> authenticated(user)
-        |> post(@endpoint_expense_category, %{"expense_category" => expense_category_params})
+        |> post(@endpoint_expense_categories, %{"expense_category" => expense_category_params})
         |> json_response(422)
 
       assert %{"name" => ["can't be blank"]} = result
@@ -86,7 +86,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         build_conn()
         |> authenticated(user)
-        |> put(@endpoint_expense_category <> "/#{expense_category_id}", %{"expense_category" => params})
+        |> put(@endpoint_expense_categories <> "/#{expense_category_id}", %{"expense_category" => params})
         |> json_response(200)
 
       assert %{"color" => "#FFF"} = result
@@ -100,7 +100,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
       result =
         build_conn()
         |> authenticated(user)
-        |> put(@endpoint_expense_category <> "/#{expense_category_id}", %{"expense_category" => params})
+        |> put(@endpoint_expense_categories <> "/#{expense_category_id}", %{"expense_category" => params})
         |> json_response(422)
 
       assert %{"name" => ["can't be blank"]} = result
@@ -113,7 +113,7 @@ defmodule MyExpensesWeb.Api.V1.Controllers.ExpensesControllerTest do
 
       build_conn()
       |> authenticated(user)
-      |> delete(@endpoint_expense_category <> "/#{id}")
+      |> delete(@endpoint_expense_categories <> "/#{id}")
       |> json_response(204)
     end
   end

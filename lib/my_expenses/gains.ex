@@ -19,19 +19,14 @@ defmodule MyExpenses.Gains do
   @doc """
   Retorna uma lista de categoria de ganhos
   """
-  @spec list_gains_category :: [%Schema.GainCategory{}] | nil
-  def list_gains_category do
-    MyExpenses.Repo.all(Schema.GainCategory)
-  end
+  @spec list_gain_categories :: [%Schema.GainCategory{}] | nil
+  def list_gain_categories, do: MyExpenses.Repo.all(Schema.GainCategory)
 
   @doc """
   Retorna uma categoria de gastos conforme id informado
   """
-  @spec show_gain_category(gain_category_filter_params) :: %Schema.GainCategory{} | nil
-  def show_gain_category(category_id) do
-    Schema.GainCategory
-    |> MyExpenses.Repo.get(category_id)
-  end
+  @spec get_gain_category(gain_category_filter_params) :: %Schema.GainCategory{} | nil
+  def get_gain_category(category_id), do: MyExpenses.Repo.get(Schema.GainCategory, category_id)
 
   @doc """
   Cria uma categoria conforme os parametros informados.
@@ -57,11 +52,7 @@ defmodule MyExpenses.Gains do
   @doc """
   Deleta uma categoria de gastos conforme id informado
   """
-  def delete_gain_category(category_id) do
-    Schema.GainCategory
-    |> MyExpenses.Repo.get!(category_id)
-    |> MyExpenses.Repo.delete()
-  end
+  def delete_gain_category(%Schema.GainCategory{} = category), do: MyExpenses.Repo.delete(category)
 
   @doc """
   Lista os ganhos apartir dos paramêtros
@@ -78,15 +69,31 @@ defmodule MyExpenses.Gains do
   @doc """
   Retorna o ganho conforme o id informado.
   """
-  def show_gain(id) do
-    MyExpenses.Repo.get(Schema.Gain, id)
+  def get_gain(id), do: MyExpenses.Repo.get(Schema.Gain, id)
+
+  def get_gain_by(params) do
+    params
+    |> GainsQuery.get_gain_by()
+    |> MyExpenses.Repo.one()
   end
 
-  def create_gain(%Schema.GainCategory{} = gain_category, params) do
-    %Schema.Gain{
-      gain_category_id: gain_category.id
-    }
+  def create_gain(params) do
+    %Schema.Gain{}
     |> Schema.Gain.create_changeset(params)
     |> MyExpenses.Repo.insert()
+  end
+
+  def update_gain(%Schema.Gain{} = gain, params) do
+    gain
+    |> Schema.Gain.update_changeset(params)
+    |> MyExpenses.Repo.update()
+  end
+
+  def delete_gain(%Schema.Gain{} = gain) do
+    deleted_at = DateTime.truncate(Timex.now(), :second)
+
+    gain
+    |> Ecto.Changeset.change(%{deleted_at: deleted_at})
+    |> MyExpenses.Repo.update()
   end
 end

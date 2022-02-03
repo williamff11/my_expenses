@@ -29,17 +29,29 @@ defmodule MyExpensesWeb.Router do
 
     resources "accounts", AccountController, only: [:index, :show, :create, :update, :delete]
 
+    get "/expense_categories", ExpenseController, :index_expense_categories
+    get "/expense_categories/:id", ExpenseController, :show_expense_category
+    post "/expense_categories", ExpenseController, :create_expense_category
+    put "/expense_categories/:id", ExpenseController, :update_expense_category
+    delete "/expense_categories/:id", ExpenseController, :delete_expense_category
+
     get "/expenses", ExpenseController, :index_expenses
     get "/expenses/:id", ExpenseController, :show_expense
     post "/expenses", ExpenseController, :create_expense
     put "/expenses/:id", ExpenseController, :update_expense
     delete "/expenses/:id", ExpenseController, :delete_expense
 
-    get "/expense_categories", ExpenseController, :index_expense_categories
-    get "/expense_categories/:id", ExpenseController, :show_expense_category
-    post "/expense_categories", ExpenseController, :create_expense_category
-    put "/expense_categories/:id", ExpenseController, :update_expense_category
-    delete "/expense_categories/:id", ExpenseController, :delete_expense_category
+    get "/gain_categories", GainController, :index_gain_categories
+    get "/gain_categories/:id", GainController, :get_gain_category
+    post "/gain_categories", GainController, :create_gain_category
+    put "/gain_categories/:id", GainController, :update_gain_category
+    delete "/gain_categories/:id", GainController, :delete_gain_category
+
+    get "/gains", GainController, :index_gains
+    get "/gains/:id", GainController, :show_gain
+    post "/gains", GainController, :create_gain
+    put "/gains/:id", GainController, :update_gain
+    delete "/gains/:id", GainController, :delete_gain
   end
 
   # Other scopes may use custom stacks.
