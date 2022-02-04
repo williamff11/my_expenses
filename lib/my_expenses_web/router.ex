@@ -23,6 +23,12 @@ defmodule MyExpensesWeb.Router do
     get "/", PageController, :index
   end
 
+  scope "api/v1/login", MyExpensesWeb.Api.V1.Controllers do
+    pipe_through :api
+
+    post "/", AuthController, :login
+  end
+
   scope "/api/v1", MyExpensesWeb.Api.V1.Controllers do
     pipe_through :api
     pipe_through :auth

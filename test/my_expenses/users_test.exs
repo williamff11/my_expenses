@@ -1,7 +1,7 @@
 defmodule MyExpenses.UserTest do
   use MyExpenses.Support.DataCase, async: true
 
-  import MyExpenses.Support.Users
+  import MyExpenses.Factories
 
   alias MyExpenses.Users
   alias MyExpenses.Users.Schema
@@ -27,7 +27,7 @@ defmodule MyExpenses.UserTest do
                }
              ] = Users.list_users()
 
-      new_usuario = create_user()
+      new_usuario = insert(:user)
 
       Users.delete_user(new_usuario)
 
@@ -98,8 +98,8 @@ defmodule MyExpenses.UserTest do
                login: _
              } = Users.get_user(user_id)
 
-      Users.delete_user(user)
-      refute Users.get_user(user_id)
+      assert {:ok, %{deleted_at: deleted_at}} = Users.delete_user(user)
+      refute deleted_at == nil
     end
 
     test "show usuario deletado", context do
@@ -157,7 +157,8 @@ defmodule MyExpenses.UserTest do
                 email: "usuario@usuario.com",
                 phone: "69999998888",
                 birth_date: ~D[2020-01-01],
-                password: "123456",
+                salt: _,
+                password: _,
                 login: "michael",
                 deleted_at: nil
               }} = Users.create_user(params)
@@ -172,7 +173,6 @@ defmodule MyExpenses.UserTest do
 
       user_id = user.id
       login_original = user.login
-      password_original = user.password
 
       params_update = %{email: "michael@scott.com", phone: "69998741593"}
 
@@ -185,7 +185,8 @@ defmodule MyExpenses.UserTest do
                 birth_date: _,
                 cpf: _,
                 login: ^login_original,
-                password: ^password_original,
+                salt: _,
+                password: _,
                 deleted_at: nil
               }} = Users.update_user(user, params_update)
     end
@@ -210,6 +211,6 @@ defmodule MyExpenses.UserTest do
   end
 
   defp setup_user(_) do
-    %{user: create_user()}
+    %{user: insert(:user)}
   end
 end
