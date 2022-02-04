@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, staging]
+    branches: [ci, main, staging]
   pull_request:
-    branches: [main, staging]
+    branches: [ci, main, staging]
 
 env:
   MIX_ENV: test
