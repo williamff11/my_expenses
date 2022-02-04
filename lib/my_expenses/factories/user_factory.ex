@@ -11,6 +11,7 @@ defmodule MyExpenses.Factories.UserFactory do
           birth_date: Faker.Date.date_of_birth(16..60),
           cpf: Brcpfcnpj.cnpj_generate(),
           login: String.downcase(Faker.Person.first_name()),
+          salt: "salt",
           password: "123456"
         }
       end

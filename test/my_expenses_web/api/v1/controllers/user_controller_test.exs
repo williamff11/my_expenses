@@ -29,6 +29,8 @@ defmodule MyExpensesWeb.Api.V1.Controllers.UserControllerTest do
         |> json_response(200)
 
       assert [%{"id" => _, "email" => _} | _] = result
+
+      refute result |> List.first() |> Map.get("password")
     end
 
     test "show - returns 200 and show user by params when user is authenticated", context do

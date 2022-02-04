@@ -121,7 +121,7 @@ defmodule MyExpenses.ExpensesTest do
       assert {
                :ok,
                %Schema.ExpenseCategory{id: ^category_id}
-             } = Expenses.delete_expense_category(category_id)
+             } = Expenses.delete_expense_category(category)
 
       refute Expenses.get_expense_category(category_id)
     end

@@ -10,6 +10,7 @@ defmodule MyExpenses.Repo.Migrations.CreateUsers do
       add :birth_date, :date, null: false
       add :cpf, :string, unique: true, null: false
       add :login, :string, size: 50, unique: true, null: false
+      add :salt, :string, null: false
       add :password, :string, size: 200, null: false
 
       add :deleted_at, :utc_datetime
