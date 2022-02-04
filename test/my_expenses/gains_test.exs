@@ -65,23 +65,23 @@ defmodule MyExpenses.GainsTest do
     end
 
     test "retorna erro caso o nome da categoria já exista" do
-      params = %{
+      params_1 = %{
         color: "#E80345",
         description: "Categoria destinada para ganhos referentes à salário",
         icon: "https://www.flaticon.com/br/icone-gratis/utensilios-de-restaurante_18500",
         name: "Ações"
       }
 
-      Gains.create_gain_category(params)
+      Gains.create_gain_category(params_1)
 
-      params = %{
+      params_2 = %{
         color: "#E80345",
         description: "Categoria destinada para ganhos referentes à salário",
         icon: "https://www.flaticon.com/br/icone-gratis/utensilios-de-restaurante_18500",
         name: "Ações"
       }
 
-      assert {:error, errors} = Gains.create_gain_category(params)
+      assert {:error, errors} = Gains.create_gain_category(params_2)
 
       assert errors_on(errors) == %{name: ["has already been taken"]}
     end
