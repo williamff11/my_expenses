@@ -15,8 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        elixir: [1.11]
-        otp: [23.2]
+        otp: ['22.2.7']
+        elixir: ['1.11']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -24,10 +24,10 @@ jobs:
           fetch-depth: 0
         
       - name: Setup
-        uses: actions/setup-elixir@v1
+        uses: erlef/setup-elixir@v1
         with:
-          elixir-version: ${{ matrix.elixir }}
           otp-version: ${{ matrix.otp }}
+          elixir-version: ${{ matrix.elixir }}
 
       - name: Install deps
         run: |
