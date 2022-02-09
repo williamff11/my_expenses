@@ -63,25 +63,25 @@ jobs:
   #       run: mix credo --strict --ignore refactor
 
   # unit_tests:
-    name: Unit Tests
-    needs: deps
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        otp: ['23.0.0']
-        elixir: ['1.11.4']
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
+    # name: Unit Tests
+    # needs: deps
+    # runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     otp: ['23.0.0']
+    #     elixir: ['1.11.4']
+    # steps:
+    #   - name: Checkout
+    #     uses: actions/checkout@v2
+    #     with:
+    #       fetch-depth: 0
         
-      - name: Setup
-        uses: actions/setup-elixir@v1
-        with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
+    #   - name: Setup
+    #     uses: actions/setup-elixir@v1
+    #     with:
+    #       elixir-version: ${{ matrix.elixir }}
+    #       otp-version: ${{ matrix.otp }}
       
-      - name: Run tests
-        run: mix test --slowest 10
+    #   - name: Run tests
+    #     run: mix test --slowest 10
