@@ -105,7 +105,7 @@ defmodule MyExpenses.Users.Schema.User do
     end
   end
 
-  def generate_salt() do
+  def generate_salt do
     alphabets = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     numbers = "0123456789"
 
