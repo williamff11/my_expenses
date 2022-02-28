@@ -41,8 +41,16 @@ defmodule MyExpenses.Expenses.Schema.ExpenseCategory do
   end
 
   @impl Access
-  def fetch(%__MODULE__{} = struct, key) do
-    Map.fetch(struct, key)
+  def fetch(%__MODULE__{} = struct, key), do: Map.fetch(struct, key)
+
+  @impl Access
+  def get_and_update(_, _, _) do
+    raise "not implemented"
+  end
+
+  @impl Access
+  def pop(_, _) do
+    raise "not implemented"
   end
 
   def changeset(%__MODULE__{} = struct, params) do
