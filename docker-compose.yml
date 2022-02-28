@@ -39,9 +39,9 @@ services:
     environment:
       PGUSER: postgres
       PGPASSWORD: postgres
-      PGDATABASE: neru_core_dev
+      PGDATABASE: my_expenses_test
       PGPORT: 5432
-      PGHOST: db
+      PGHOST: postgres
     ports:
       - "4000:4000"
     depends_on:

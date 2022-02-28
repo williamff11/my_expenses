@@ -4,8 +4,8 @@ defmodule MyExpenses.Gains do
   """
   import Ecto.Query
 
-  alias MyExpenses.Gains.Schema
   alias MyExpenses.Gains.Query.GainsQuery
+  alias MyExpenses.Gains.Schema
 
   @type gain_category_filter_params() :: [id: non_neg_integer()]
 

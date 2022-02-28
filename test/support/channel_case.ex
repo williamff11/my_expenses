@@ -17,6 +17,8 @@ defmodule MyExpensesWeb.ChannelCase do
 
   use ExUnit.CaseTemplate
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
       # Import conveniences for testing with channels
@@ -29,10 +31,10 @@ defmodule MyExpensesWeb.ChannelCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(MyExpenses.Repo)
+    :ok = Sandbox.checkout(MyExpenses.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(MyExpenses.Repo, {:shared, self()})
+      Sandbox.mode(MyExpenses.Repo, {:shared, self()})
     end
 
     :ok

@@ -23,7 +23,7 @@ defmodule MyExpensesWeb.Router do
     get "/", PageController, :index
   end
 
-  scope "api/v1/login", MyExpensesWeb.Api.V1.Controllers do
+  scope "/api/v1/login", MyExpensesWeb.Api.V1.Controllers do
     pipe_through :api
 
     post "/", AuthController, :login
@@ -33,8 +33,8 @@ defmodule MyExpensesWeb.Router do
     pipe_through :api
     pipe_through :auth
 
-    resources "accounts", AccountController, only: [:index, :show, :create, :update, :delete]
-    resources "users", UserController, only: [:index, :show, :create, :update, :delete]
+    resources "/accounts", AccountController, only: [:index, :show, :create, :update, :delete]
+    resources "/users", UserController, only: [:index, :show, :create, :update, :delete]
 
     get "/expense_categories", ExpenseController, :index_expense_categories
     get "/expense_categories/:id", ExpenseController, :show_expense_category
