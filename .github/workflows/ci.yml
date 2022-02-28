@@ -53,13 +53,13 @@ jobs:
         #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
         #     restore-keys: |
         #       ${{ runner.os }}-yarn-
+          # mix local.rebar --force
+          # mix local.hex --force
+          # mix deps.compile
         
       - name: Install deps
         run: |
-          mix local.rebar --force
-          mix local.hex --force
           mix deps.get
-          mix deps.compile
 
       - run: mix format --check-formatted
       - run: mix credo --strict --ignore refactor
