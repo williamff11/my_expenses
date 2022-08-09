@@ -11,24 +11,32 @@ database_url =
     For example: ecto://USER:PASS@HOST/DATABASE
     """
 
-jwt_secret = System.get_env("JWT_SECRET") || raise "'JWT_SECRET' is not defined."
-
-config :my_expenses, MyExpenses.Repo,
-  # ssl: true,
-  url: database_url,
-  pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
-
-database_url =
-  System.get_env("DATABASE_URL") ||
+username =
+  System.get_env("USERNAME") ||
     raise """
-    environment variable DATABASE_URL is missing.
-    For example: ecto://USER:PASS@HOST/DATABASE
+    environment variable USERNAME is missing.
+    """
+
+password =
+  System.get_env("PASSWORD") ||
+    raise """
+    environment variable PASSWORD is missing.
+    """
+
+database =
+  System.get_env("DATABASE") ||
+    raise """
+    environment variable PASSWORD is missing.
     """
 
 config :my_expenses, MyExpenses.Repo,
-  # ssl: true,
+  username: username,
+  password: password,
+  database: database,
   url: database_url,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10")
+
+jwt_secret = System.get_env("JWT_SECRET") || raise "'JWT_SECRET' is not defined."
 
 secret_key_base =
   System.get_env("SECRET_KEY_BASE") ||
